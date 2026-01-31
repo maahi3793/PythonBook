@@ -223,4 +223,44 @@ class TextbookDB:
                 "error_message": error
             }).execute()
         except Exception:
-            pass # Don't crash on logging failure
+            pass
+            
+    def get_all_chapters_metadata(self):
+        """Fetch metadata for all chapters (day, title, status) for sidebar."""
+        try:
+            response = self.client.table("textbook_chapters") \
+                .select("day, title, status, part1_at, part2_at, part3_at") \
+                .order("day") \
+                .execute()
+            return response.data if response.data else []
+        except Exception as e:
+            logging.error(f"Error fetching chapter metadata: {e}")
+            return []
+
+    def get_pending_images(self):
+        """Fetch all images that need review/upload."""
+        try:
+            response = self.client.table("textbook_images") \
+                .select("*") \
+                .neq("status", "uploaded") \
+                .order("chapter_day") \
+                .execute()
+            return response.data if response.data else []
+        except Exception as e:
+            logging.error(f"Error fetching pending images: {e}")
+            return []
+            
+    def update_image_url(self, image_id: str, public_url: str):
+        """Update an image with its hosted URL."""
+        try:
+            self.client.table("textbook_images") \
+                .update({
+                    "selected_url": public_url,
+                    "status": "uploaded"
+                }) \
+                .eq("id", image_id) \
+                .execute()
+            return True
+        except Exception as e:
+            logging.error(f"Error updating image URL: {e}")
+            return False
