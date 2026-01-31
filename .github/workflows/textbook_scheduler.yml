@@ -52,14 +52,60 @@ jobs:
           sudo apt-get install -y pandoc wkhtmltopdf
 
       - name: Run Generator
+        shell: python
         run: |
-          MODE="${{ github.event.inputs.action || 'all' }}"
-          DAY="${{ github.event.inputs.day || '1' }}"
+          import os
+          import datetime
           
-          if [ "$MODE" == "weekly" ]; then
-            python run_textbook_bot.py --weekly 1
-          elif [ "$MODE" == "final" ]; then
-            python run_textbook_bot.py --final
-          else
-            python run_textbook_bot.py --day "$DAY" --part "$MODE"
-          fi
+          # Get inputs from environment variables (set by GitHub Actions)
+          event_name = os.getenv("GITHUB_EVENT_NAME")
+          # Inputs are passed as environment variables by mapped 'env' context or obscure github context
+          # Easier way: check event payload or just default if inputs missing
+          
+          # We'll use the arguments directly in the command execution for simplicity
+          # But we need to construct the command
+          
+          mode = "all"
+          day = "1"
+          
+          # GitHub context access via templating in the python script string
+          # We pass these as args to avoid syntax issues
+          raw_action = "${{ github.event.inputs.action }}"
+          raw_day = "${{ github.event.inputs.day }}"
+          
+          if event_name == "workflow_dispatch":
+              mode = raw_action if raw_action else "all"
+              day = raw_day if raw_day else "1"
+          
+          elif event_name == "schedule":
+              now = datetime.datetime.utcnow()
+              hour = now.hour
+              print(f"Schedule Trigger. UTC Hour: {hour}")
+              
+              if 2 <= hour < 4:
+                  mode = "part1"  # 02:30 UTC
+              elif 4 <= hour < 6:
+                  mode = "part2"  # 04:30 UTC
+              elif 6 <= hour < 8:
+                  mode = "part3"  # 06:30 UTC
+              elif hour >= 8:
+                  mode = "weekly" # 08:30 UTC
+              
+              day = "auto"
+          
+          print(f"Running generator with Mode: {mode}, Day: {day}")
+          
+          import subprocess
+          
+          cmd = ["python", "run_textbook_bot.py"]
+          
+          if mode == "weekly":
+              cmd.extend(["--weekly", "1"])
+          elif mode == "final":
+              cmd.extend(["--final"])
+          elif mode == "all":
+              cmd.extend(["--day", day, "--part", "all"])
+          else:
+              cmd.extend(["--day", day, "--part", mode])
+              
+          subprocess.run(cmd, check=True)
