@@ -47,7 +47,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install Pandoc
-        run: sudo apt-get install -y pandoc wkhtmltopdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc wkhtmltopdf
 
       - name: Run Generator
         run: |
