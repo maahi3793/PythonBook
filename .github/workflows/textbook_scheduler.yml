@@ -2,117 +2,62 @@ name: Textbook Content Generator
 
 on:
   schedule:
-    # Part 1 (Theory): 08:00 IST = 02:30 UTC
     - cron: '30 2 * * *'
-    # Part 2 (Practice): 10:00 IST = 04:30 UTC
     - cron: '30 4 * * *'
-    # Part 3 (Mentor): 12:00 IST = 06:30 UTC
     - cron: '30 6 * * *'
-    # Weekly Summary: 14:00 IST = 08:30 UTC (Saturdays only)
     - cron: '30 8 * * 6'
   workflow_dispatch:
     inputs:
       action:
-        description: 'Choose what to generate'
+        description: Choose what to generate
         required: true
-        default: 'Day Content (All Parts)'
+        default: all
         type: choice
         options:
-        - Day Content (All Parts)
-        - Day Content (Part 1 Only)
-        - Day Content (Part 2 Only)
-        - Day Content (Part 3 Only)
-        - Weekly Summary
-        - Final Chapter
+          - all
+          - part1
+          - part2
+          - part3
+          - weekly
+          - final
       day:
-        description: 'Day number (for Day Content)'
+        description: Day number (1-179)
         required: false
-        type: number
+        default: '1'
+        type: string
 
 jobs:
   generate-content:
     runs-on: ubuntu-latest
-    
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          
+
       - name: Install Dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Install Pandoc
         run: sudo apt-get install -y pandoc wkhtmltopdf
-      
-      - name: Determine Run Mode
-        id: mode
-        shell: python
-        run: |
-          import os
-          import datetime
-          
-          event_name = "${{ github.event_name }}"
-          manual_action = "${{ github.event.inputs.action }}"
-          manual_day = "${{ github.event.inputs.day }}"
-          
-          mode = ""
-          day = ""
-          
-          if event_name == "workflow_dispatch":
-              print(f"Manual Trigger: {manual_action}")
-              if "Part 1" in manual_action:
-                  mode = "part1"
-              elif "Part 2" in manual_action:
-                  mode = "part2"
-              elif "Part 3" in manual_action:
-                  mode = "part3"
-              elif "All Parts" in manual_action:
-                  mode = "all"
-              elif "Weekly" in manual_action:
-                  mode = "weekly"
-              elif "Final" in manual_action:
-                  mode = "final"
-              day = manual_day if manual_day else "1"
-              
-          elif event_name == "schedule":
-              now = datetime.datetime.utcnow()
-              hour = now.hour
-              print(f"Schedule Trigger. UTC Hour: {hour}")
-              
-              # Determine part based on time
-              if hour >= 2 and hour < 4:
-                  mode = "part1"
-              elif hour >= 4 and hour < 6:
-                  mode = "part2"
-              elif hour >= 6 and hour < 8:
-                  mode = "part3"
-              elif hour >= 8:
-                  mode = "weekly"
-              
-              # Day is determined from database (current progress)
-              day = "auto"
-          
-          print(f"Mode: {mode}, Day: {day}")
-          
-          with open(os.environ['GITHUB_ENV'], 'a') as f:
-              f.write(f"MODE={mode}\n")
-              f.write(f"DAY={day}\n")
 
-      - name: Generate Textbook Content
-        if: env.MODE != ''
+      - name: Run Generator
         run: |
-          if [ "${{ env.MODE }}" == "weekly" ]; then
+          MODE="${{ github.event.inputs.action || 'all' }}"
+          DAY="${{ github.event.inputs.day || '1' }}"
+          
+          if [ "$MODE" == "weekly" ]; then
             python run_textbook_bot.py --weekly 1
-          elif [ "${{ env.MODE }}" == "final" ]; then
+          elif [ "$MODE" == "final" ]; then
             python run_textbook_bot.py --final
           else
-            python run_textbook_bot.py --day ${{ env.DAY }} --part ${{ env.MODE }}
+            python run_textbook_bot.py --day "$DAY" --part "$MODE"
           fi
