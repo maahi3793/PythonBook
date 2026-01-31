@@ -37,6 +37,13 @@ def run_generation(day: int, part: str):
     
     logging.info(f"🚀 Starting generation for Day {day} - {part}")
 
+    # Check for Quiz Day and Skip
+    if db.is_quiz_day(day):
+        msg = f"🚫 Day {day} is a designated QUIZ DAY. Skipping textbook generation."
+        logging.warning(msg)
+        db.log_generation(day, part, 'skipped', 'Quiz Day')
+        return
+
     # ==========================
     # PART 1: THEORY
     # ==========================

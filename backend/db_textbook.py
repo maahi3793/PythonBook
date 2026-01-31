@@ -194,6 +194,25 @@ class TextbookDB:
         except Exception as e:
             logging.error(f"Error saving images for day {day}: {e}")
 
+    def is_quiz_day(self, day: int) -> bool:
+        """Check if the day is a dedicated Quiz day (e.g. Topic contains 'Quiz')."""
+        try:
+            lesson = self.get_pydaily_lesson(day)
+            if lesson:
+                topic = lesson.get('topic', '')
+                # Heuristic: If topic explicitly mentions "Quiz" and not just "Quiz App" (like a project)
+                # Ideally, we want to skip "Day X: Quiz". 
+                # Be careful not to skip "Project: Quiz App". 
+                # Let's assume strict "Quiz" word or maybe user has a flag. 
+                # For now, simple check: "Quiz" in topic? 
+                # Or check if content is empty but quiz exists?
+                # User said "days for quizes".
+                if "Quiz" in topic and "Project" not in topic: 
+                    return True
+            return False
+        except Exception:
+            return False
+
     def log_generation(self, day: int, part: str, status: str, error: str = None):
         """Log the result of a generation run."""
         try:
