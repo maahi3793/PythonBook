@@ -8,14 +8,14 @@ on:
     - cron: '30 4 * * *'
     # Part 3 (Mentor): 12:00 IST = 06:30 UTC
     - cron: '30 6 * * *'
-    # Weekly Summary: 14:00 IST = 08:30 UTC (Saturdays only - checked in code)
+    # Weekly Summary: 14:00 IST = 08:30 UTC (Saturdays only)
     - cron: '30 8 * * 6'
   workflow_dispatch:
     inputs:
       action:
         description: 'Choose what to generate'
         required: true
-        default: 'Day Content'
+        default: 'Day Content (All Parts)'
         type: choice
         options:
         - Day Content (All Parts)
@@ -67,7 +67,7 @@ jobs:
           day = ""
           
           if event_name == "workflow_dispatch":
-              print(f"🔹 Manual Trigger: {manual_action}")
+              print(f"Manual Trigger: {manual_action}")
               if "Part 1" in manual_action:
                   mode = "part1"
               elif "Part 2" in manual_action:
@@ -85,14 +85,14 @@ jobs:
           elif event_name == "schedule":
               now = datetime.datetime.utcnow()
               hour = now.hour
-              print(f"🔹 Schedule Trigger. UTC Hour: {hour}")
+              print(f"Schedule Trigger. UTC Hour: {hour}")
               
               # Determine part based on time
-              if 2 <= hour < 4:
+              if hour >= 2 and hour < 4:
                   mode = "part1"
-              elif 4 <= hour < 6:
+              elif hour >= 4 and hour < 6:
                   mode = "part2"
-              elif 6 <= hour < 8:
+              elif hour >= 6 and hour < 8:
                   mode = "part3"
               elif hour >= 8:
                   mode = "weekly"
@@ -100,7 +100,7 @@ jobs:
               # Day is determined from database (current progress)
               day = "auto"
           
-          print(f"✅ Mode: {mode}, Day: {day}")
+          print(f"Mode: {mode}, Day: {day}")
           
           with open(os.environ['GITHUB_ENV'], 'a') as f:
               f.write(f"MODE={mode}\n")
