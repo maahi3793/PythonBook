@@ -8,17 +8,26 @@ from backend.db_textbook import TextbookDB
 def render_image_manager(db: TextbookDB):
     st.title("🖼️ Image Manager")
     
-    # 1. Fetch pending images
-    pending_images = db.get_pending_images()
+    # Toggle to show all
+    show_all = st.sidebar.checkbox("Show All Images (Including Uploaded)")
     
-    if not pending_images:
-        st.success("✅ No pending images! All diagrams are covered.")
+    # 1. Fetch images
+    if show_all:
+        try:
+            res = db.client.table("textbook_images").select("*").order("chapter_day").execute()
+            images = res.data
+        except: images = []
+    else:
+        images = db.get_pending_images()
+    
+    if not images:
+        st.success("✅ No images found.")
         return
 
-    st.write(f"Found {len(pending_images)} images needing attention.")
+    st.write(f"Found {len(images)} images.")
     
     # Convert to DataFrame for easier display
-    df = pd.DataFrame(pending_images)
+    df = pd.DataFrame(images)
     
     # Display table
     for i, row in df.iterrows():
@@ -50,25 +59,34 @@ def render_image_manager(db: TextbookDB):
                             path = f"{row['id']}.{ext}" # e.g. IMG_CH01_01.png
                             
                             # 2. Upload to Storage
-                            # Bucket: textbook-images
                             file_bytes = uploaded_file.getvalue()
+                            size_kb = len(file_bytes) / 1024
+                            st.write(f"📝 File Size: {size_kb:.2f} KB")
+                            
                             content_type = f"image/{ext}" if ext != 'jpg' else 'image/jpeg'
+                            
+                            # Log attempt
+                            st.write(f"🚀 Uploading to path: `{path}`...")
                             
                             res = db.client.storage.from_("textbook-images").upload(
                                 path=path,
                                 file=file_bytes,
                                 file_options={"content-type": content_type, "upsert": "true"}
                             )
+                            st.write(f"✅ Supabase Response: `{res}`")
                             
                             # 3. Get Public URL
                             public_url = db.client.storage.from_("textbook-images").get_public_url(path)
+                            st.write(f"🔗 URL: `{public_url}`")
                             
                             # 4. Update DB
                             if db.update_image_url(row['id'], public_url):
-                                st.success(f"✅ Uploaded! URL: {public_url}")
-                                st.rerun()
+                                st.success(f"✅ Upload Complete! Image saved to DB.")
+                                if st.button("Reload Page", key=f"reload_{row['id']}"):
+                                    st.rerun()
                             else:
-                                st.error("Failed to update database record.")
+                                st.error("❌ Failed to update database record.")
                                 
                         except Exception as e:
-                            st.error(f"Upload Failed: {e}")
+                            st.error(f"❌ Upload Failed Details: {e}")
+                            logging.error(f"Upload failed: {e}")
