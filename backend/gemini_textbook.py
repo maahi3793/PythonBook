@@ -115,9 +115,18 @@ class GeminiTextbook:
         """Call the API with retries using legacy SDK."""
         try:
             response = self.model.generate_content(prompt)
-            if not response.text:
-                raise ValueError("Empty response from Gemini")
-            return response.text
+            
+            # Check if response was blocked
+            if hasattr(response, 'prompt_feedback') and response.prompt_feedback.block_reason:
+                raise ValueError(f"Blocked by Safety Filters: {response.prompt_feedback}")
+            
+            # Force access to text to trigger potential errors early
+            text = response.text
+            
+            if not text or len(text) < 10:
+                raise ValueError("Response text is empty or too short.")
+                
+            return text
         except Exception as e:
             logging.error(f"Gemini API Error: {e}")
             raise
