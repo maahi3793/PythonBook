@@ -122,9 +122,11 @@ def _render_markdown_with_images(content, day, db):
     buffer = []
     
     in_image_block = False
+    in_ignore_block = False # Generic ignore
     current_image_id = None
     
     for line in lines:
+        # 1. Image Block Start
         if '<!-- IMAGE_PLACEHOLDER:' in line:
             # Flush buffer
             if buffer:
@@ -132,25 +134,35 @@ def _render_markdown_with_images(content, day, db):
                 buffer = []
             
             # Extract ID
-            match = re.search(r'ID_PLACEHOLDER:\s*(.*?)\s*-->', line.replace("IMAGE_", "ID_")) # typo in regex logic? 
-            # Re-read image_extractor.py: "<!-- IMAGE_PLACEHOLDER: (.*?) -->"
             match = re.search(r'IMAGE_PLACEHOLDER:\s*(.*?)\s*-->', line)
             if match:
                 current_image_id = match.group(1).strip()
             in_image_block = True
             
-        elif in_image_block and '-->' in line:
-            # End of block
-            in_image_block = False
+        # 2. Block End (Generic)
+        elif (in_image_block or in_ignore_block) and '-->' in line:
+            in_ignore_block = False
             
-            # Render Image Widget
-            if current_image_id:
-                _render_image_widget(current_image_id, day, db)
-            current_image_id = None
-            
+            # If leaving image block, render widget
+            if in_image_block:
+                in_image_block = False
+                if current_image_id:
+                    _render_image_widget(current_image_id, day, db)
+                current_image_id = None
+        
+        # 3. Swallow Image Block Content
         elif in_image_block:
-            pass # Skip description/url lines in the markdown output
+            pass 
             
+        # 4. Detect Suggested URLs or Description outside block (Legacy/Gemini quirks)
+        elif '<!-- SUGGESTED_URLS:' in line or '<!-- DESCRIPTION:' in line:
+            in_ignore_block = True
+            
+        # 5. Generic Ignore Swallow
+        elif in_ignore_block:
+            pass
+            
+        # 6. Normal Content
         else:
             buffer.append(line)
             
@@ -160,15 +172,6 @@ def _render_markdown_with_images(content, day, db):
 
 def _render_image_widget(image_id, day, db):
     """Render the image or a placeholder warning."""
-    # Fetch image status from DB
-    # We need a db method for this, or query directly
-    # Ideally db.get_image(image_id)
-    
-    # For now, let's just query directly via client if we can, or add helper
-    # Adding helper to db is better path.
-    # checking db_textbook.py...
-    
-    # Temporary direct query for MVP
     try:
         response = db.client.table("textbook_images").select("*").eq("id", image_id).execute()
         img_data = response.data[0] if response.data else None
@@ -178,5 +181,11 @@ def _render_image_widget(image_id, day, db):
     if img_data and img_data.get('status') == 'uploaded' and img_data.get('selected_url'):
         st.image(img_data['selected_url'], caption=img_data.get('description', ''))
     else:
-        # Render Warning Box
-        st.warning(f"🖼️ **Diagram Missing:** `{image_id}`\n\nGo to 'Manage Images' to upload this.")
+        # Render Warning Box with Description for Manual Gen
+        desc = img_data.get('description', 'No description available.') if img_data else "No data."
+        
+        st.warning(
+            f"🖼️ **Diagram Missing:** `{image_id}`\n\n"
+            f"**AI Prompt:**\n> {desc}\n\n"
+            f"Go to 'Manage Images' to upload this."
+        )

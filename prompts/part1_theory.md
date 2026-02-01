@@ -46,19 +46,9 @@ graph TD
 When a visual diagram would be helpful, use this exact format:
 
 <!-- IMAGE_PLACEHOLDER: IMG_CH{{day:02d}}_01 -->
-<!-- DESCRIPTION: Brief description of what the image should show -->
-<!-- SUGGESTED_URLS:
-  - https://example.com/relevant-image.png
-  - https://another-site.com/diagram.png
-  - https://stackoverflow.com/questions/12345 (if contains relevant diagram)
--->
+<!-- DESCRIPTION: A detailed, high-quality prompt for an AI image generator (Midjourney/DALL-E). Describe the scene, objects, lighting, and style (e.g. "Minimalist tech illustration of a Python list structure, flat design, dark mode colors"). Do NOT explain the concept here, just describe the visual. -->
 
-Search for actual URLs from:
-- RealPython.com
-- Python.org
-- GeeksForGeeks
-- Stack Overflow answers with diagrams
-- pythontutor.com
+DO NOT include any "Suggested URLs". We are generating custom images.
 
 ## TONE
 Academic but approachable. Like MIT OpenCourseWare or "Fluent Python" by Luciano Ramalho.

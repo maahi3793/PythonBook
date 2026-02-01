@@ -40,15 +40,35 @@ def render_image_manager(db: TextbookDB):
                 uploaded_file = st.file_uploader(f"Upload for {row['id']}", type=['png', 'jpg', 'jpeg'], key=row['id'])
                 
                 if uploaded_file:
-                    # TODO: Implement actual Supabase Storage upload
-                    # For now, we simulate success
-                    st.success(f"Ready to upload {uploaded_file.name}")
+                    st.info(f"Uploading {uploaded_file.name}...")
                     
                     if st.button("Confirm Upload", key=f"btn_{row['id']}"):
-                        # Dummy URL for now until Step 3
-                        public_url = f"https://placeholder.com/{row['id']}.png"
-                        if db.update_image_url(row['id'], public_url):
-                            st.success("Updated DB!")
-                            st.rerun()
-                        else:
-                            st.error("Failed to update.")
+                        try:
+                            # 1. Determine Path
+                            # Use ID as filename to correspond to placeholder
+                            ext = uploaded_file.name.split('.')[-1]
+                            path = f"{row['id']}.{ext}" # e.g. IMG_CH01_01.png
+                            
+                            # 2. Upload to Storage
+                            # Bucket: textbook-images
+                            file_bytes = uploaded_file.getvalue()
+                            content_type = f"image/{ext}" if ext != 'jpg' else 'image/jpeg'
+                            
+                            res = db.client.storage.from_("textbook-images").upload(
+                                path=path,
+                                file=file_bytes,
+                                file_options={"content-type": content_type, "upsert": "true"}
+                            )
+                            
+                            # 3. Get Public URL
+                            public_url = db.client.storage.from_("textbook-images").get_public_url(path)
+                            
+                            # 4. Update DB
+                            if db.update_image_url(row['id'], public_url):
+                                st.success(f"✅ Uploaded! URL: {public_url}")
+                                st.rerun()
+                            else:
+                                st.error("Failed to update database record.")
+                                
+                        except Exception as e:
+                            st.error(f"Upload Failed: {e}")
