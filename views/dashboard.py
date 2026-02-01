@@ -29,8 +29,42 @@ def render_dashboard(db: TextbookDB):
     st.progress(generated/total)
     
     st.markdown("---")
+
+    # 2. Bulk Actions (Phase 3.5)
+    st.subheader("🛠️ Control Room")
     
-    # 2. PDF Export (Placeholder for Step 4)
+    with st.expander("Batch Generation", expanded=True):
+        c1, c2, c3 = st.columns([1, 1, 2])
+        start_day = c1.number_input("Start Day", min_value=1, max_value=179, value=1)
+        end_day = c2.number_input("End Day", min_value=1, max_value=179, value=5)
+        
+        if c3.button("🚀 Generate Range", use_container_width=True):
+            if start_day > end_day:
+                st.error("Start day must be <= End day")
+            else:
+                progress_bar = st.progress(0)
+                status_text = st.empty()
+                logs = st.empty()
+                
+                from backend.generator import TextbookGenerator
+                gen = TextbookGenerator()
+                
+                total_days = end_day - start_day + 1
+                
+                for i, day in enumerate(range(start_day, end_day + 1)):
+                    status_text.text(f"Processing Day {day}...")
+                    # Generate all parts
+                    res = gen.generate_day(day, 'all')
+                    
+                    logs.write(f"Day {day}: {res.get('message', 'Unknown')}")
+                    progress_bar.progress((i + 1) / total_days)
+                    
+                st.success("Batch Complete!")
+                st.rerun()
+
+    st.markdown("---")
+    
+    # 3. PDF Export
     st.subheader("📤 Export Textbook")
     
     export_range = st.selectbox(

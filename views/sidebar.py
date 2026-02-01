@@ -28,19 +28,31 @@ def render_sidebar(chapters):
             "failed": "🔴"
         }
         
+        # Create a map of existing chapters
+        db_map = {c['day']: c for c in chapters}
+        
         chapter_titles = []
         day_map = {}
         
-        for ch in chapters:
-            icon = status_icons.get(ch.get('status', 'pending'), "⚪")
-            title = f"{icon} Day {ch['day']}: {ch['title']}"
-            chapter_titles.append(title)
-            day_map[title] = ch['day']
+        for day in range(1, 180): # 1 to 179
+            ch = db_map.get(day, {'status': 'pending', 'title': f"Day {day}"})
+            status = ch.get('status', 'pending')
+            
+            # If title is generic "Day X Content", make it shorter or keep it? 
+            # Ideally fetch topic from PyDaily if possible, but that's expensive here.
+            # Just show what we have.
+            title_text = ch.get('title', f"Day {day}")
+            
+            icon = status_icons.get(status, "⚪")
+            display_title = f"{icon} Day {day}: {title_text}"
+            
+            chapter_titles.append(display_title)
+            day_map[display_title] = day
             
         if chapter_titles:
             selected_title = st.sidebar.selectbox("Jump to Chapter", chapter_titles)
             selected_day = day_map[selected_title]
         else:
-            st.sidebar.text("No chapters found.")
+            st.sidebar.text("No chapters found.") # Should not happen now
             
     return mode, selected_day

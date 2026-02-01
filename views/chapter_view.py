@@ -3,6 +3,20 @@ Viewer module for rendering textbook chapters.
 """
 import streamlit as st
 from backend.db_textbook import TextbookDB
+import streamlit as st
+
+def _run_generation(day, part):
+    """Helper to trigger generation."""
+    with st.spinner(f"Generating {part}..."):
+        from backend.generator import TextbookGenerator
+        gen = TextbookGenerator()
+        res = gen.generate_day(day, part)
+        if res['success']:
+            st.success("Generated!")
+            return True
+        else:
+            st.error(f"Failed: {res['message']}")
+            return False
 
 def render_chapter_view(db: TextbookDB, day: int):
     # Fetch content
@@ -24,8 +38,8 @@ def render_chapter_view(db: TextbookDB, day: int):
     # Status Banner
     status = chapter.get('status', 'pending')
     if status == 'pending':
-        st.info("⚠️ This chapter has not been generated yet.")
-        return
+        st.info("⚠️ This chapter has not been generated yet. Use buttons below to start.")
+        # Do not return, continue to tabs
         
     # Tabs for Parts
     tab1, tab2, tab3 = st.tabs(["📘 Part 1: Theory", "🧪 Part 2: Practice", "🎓 Part 3: Mentor"])
@@ -34,22 +48,64 @@ def render_chapter_view(db: TextbookDB, day: int):
         content = chapter.get('content_part1_theory')
         if content:
             _render_markdown_with_images(content, day, db)
+            with st.expander("⚙️ Admin: Regenerate Part 1"):
+                if st.button("🔄 Regenerate Theory", key="regen_p1"):
+                     _run_generation(day, 'part1')
+                     st.rerun()
         else:
-            st.warning("Part 1 genertion pending.")
+            st.warning("Part 1 generation pending.")
+            if st.button("🚀 Generate Theory", key="gen_p1"):
+                with st.spinner("Generating Theory part..."):
+                    from backend.generator import TextbookGenerator
+                    gen = TextbookGenerator()
+                    res = gen.generate_day(day, 'part1')
+                    if res['success']:
+                        st.success("Generated!")
+                        st.rerun()
+                    else:
+                        st.error(f"Failed: {res['message']}")
 
     with tab2:
         content = chapter.get('content_part2_practice')
         if content:
             _render_markdown_with_images(content, day, db)
+            with st.expander("⚙️ Admin: Regenerate Part 2"):
+                if st.button("🔄 Regenerate Practice", key="regen_p2"):
+                     _run_generation(day, 'part2')
+                     st.rerun()
         else:
             st.info("Part 2 generation pending.")
+            if st.button("🚀 Generate Practice", key="gen_p2"):
+                with st.spinner("Generating Practice part..."):
+                    from backend.generator import TextbookGenerator
+                    gen = TextbookGenerator()
+                    res = gen.generate_day(day, 'part2')
+                    if res['success']:
+                        st.success("Generated!")
+                        st.rerun()
+                    else:
+                        st.error(f"Failed: {res['message']}")
 
     with tab3:
         content = chapter.get('content_part3_mentor')
         if content:
             _render_markdown_with_images(content, day, db)
+            with st.expander("⚙️ Admin: Regenerate Part 3"):
+                if st.button("🔄 Regenerate Mentor", key="regen_p3"):
+                     _run_generation(day, 'part3')
+                     st.rerun()
         else:
             st.info("Part 3 generation pending.")
+            if st.button("🚀 Generate Mentor", key="gen_p3"):
+                with st.spinner("Generating Mentor part..."):
+                    from backend.generator import TextbookGenerator
+                    gen = TextbookGenerator()
+                    res = gen.generate_day(day, 'part3')
+                    if res['success']:
+                        st.success("Generated!")
+                        st.rerun()
+                    else:
+                        st.error(f"Failed: {res['message']}")
 
 def _render_markdown_with_images(content, day, db):
     """
