@@ -2,10 +2,14 @@ name: Textbook Content Generator
 
 on:
   schedule:
-    - cron: '30 2 * * *'
-    - cron: '30 4 * * *'
-    - cron: '30 6 * * *'
-    - cron: '30 8 * * 6'
+    # 1. Part 1 (Theory): 16:30 UTC (2 hours after PyDaily Evening email)
+    - cron: '30 16 * * *'
+    # 2. Part 2 (Practice): 17:30 UTC
+    - cron: '30 17 * * *'
+    # 3. Part 3 (Mentor): 18:30 UTC
+    - cron: '30 18 * * *'
+    # 4. Weekly Summary: 19:30 UTC (Saturday)
+    - cron: '30 19 * * 6'
   workflow_dispatch:
     inputs:
       action:
@@ -59,11 +63,6 @@ jobs:
           
           # Get inputs from environment variables (set by GitHub Actions)
           event_name = os.getenv("GITHUB_EVENT_NAME")
-          # Inputs are passed as environment variables by mapped 'env' context or obscure github context
-          # Easier way: check event payload or just default if inputs missing
-          
-          # We'll use the arguments directly in the command execution for simplicity
-          # But we need to construct the command
           
           mode = "all"
           day = "1"
@@ -82,14 +81,15 @@ jobs:
               hour = now.hour
               print(f"Schedule Trigger. UTC Hour: {hour}")
               
-              if 2 <= hour < 4:
-                  mode = "part1"  # 02:30 UTC
-              elif 4 <= hour < 6:
-                  mode = "part2"  # 04:30 UTC
-              elif 6 <= hour < 8:
-                  mode = "part3"  # 06:30 UTC
-              elif hour >= 8:
-                  mode = "weekly" # 08:30 UTC
+              # New Schedule Logic: 16:30, 17:30, 18:30, 19:30
+              if 16 <= hour < 17:
+                  mode = "part1"  # 16:30 UTC
+              elif 17 <= hour < 18:
+                  mode = "part2"  # 17:30 UTC
+              elif 18 <= hour < 19:
+                  mode = "part3"  # 18:30 UTC
+              elif hour >= 19:
+                  mode = "weekly" # 19:30 UTC
               
               day = "auto"
           
