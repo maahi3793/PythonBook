@@ -136,8 +136,11 @@ class TextbookDB:
         Update a specific part of the chapter content.
         part: 'part1_theory', 'part2_practice', 'part3_mentor'
         """
-        valid_parts = ['part1_theory', 'part2_practice', 'part3_mentor']
+        valid_parts = ['content_part1_theory', 'content_part2_practice', 'content_part3_mentor']
         if part not in valid_parts:
+            # Allow legacy/short names too?
+            # If passed 'part1_theory', map to 'content_part1_theory'?
+            # No, generator sends full name. Stick to whitelist.
             logging.error(f"Invalid part name: {part}")
             return False
             
@@ -146,13 +149,14 @@ class TextbookDB:
             self.get_or_create_chapter(day)
             
             # 2. Update
+            # Derive status: content_part1_theory -> part1_done
+            # split('_') -> ['content', 'part1', 'theory'] -> index 1 is part1
+            status_prefix = part.split('_')[1] 
+            
             update_data = {
                 part: content,
-                "status": f"{part.split('_')[0]}_done" # e.g. part1_done
+                "status": f"{status_prefix}_done" 
             }
-            
-            # Special logic: If all parts present, mark complete?
-            # For now, just track the latest part done
             
             self.client.table("textbook_chapters") \
                 .update(update_data) \
@@ -210,8 +214,41 @@ class TextbookDB:
                 if "Quiz" in topic and "Project" not in topic: 
                     return True
             return False
+            return False
         except Exception:
             return False
+
+    def get_non_quiz_days(self) -> list[int]:
+        """
+        Fetch all days that are valid for the textbook (excluding Quiz days).
+        Returns a sorted list of day numbers.
+        """
+        try:
+            # Fetch all topics to filter locally (faster than 179 queries)
+            # Or assume we want days 1-179 and filter.
+            response = self.client.table("daily_content").select("day, topic").execute()
+            
+            valid_days = []
+            if response.data:
+                for row in response.data:
+                    day = row['day']
+                    topic = row.get('topic', '')
+                    
+                    # Same logic as is_quiz_day
+                    if "Quiz" in topic and "Project" not in topic:
+                        continue # Skip
+                    
+                    # Also ensure it's within range 1-179 just in case
+                    if 1 <= day <= 179:
+                        valid_days.append(day)
+            
+            # Use set to ensure uniqueness if DB has dupes, then sort
+            return sorted(list(set(valid_days)))
+            
+        except Exception as e:
+            logging.error(f"Error fetching non-quiz days: {e}")
+            # Fallback to all days if query fails
+            return list(range(1, 180))
 
     def log_generation(self, day: int, part: str, status: str, error: str = None):
         """Log the result of a generation run."""
