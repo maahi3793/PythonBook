@@ -1,7 +1,7 @@
 
 import os
 import logging
-from google import genai
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load params
@@ -10,19 +10,20 @@ load_dotenv()
 class GeminiTextbook:
     """
     AI Content Generator for PythonBook.
-    Handles prompt loading and Gemini API calls (via google-genai SDK).
+    Handles prompt loading and Gemini API calls (via legacy google-generativeai SDK).
     """
     
     def __init__(self):
-        self.api_key = os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
             logging.error("❌ GEMINI_API_KEY not found.")
             raise ValueError("GEMINI_API_KEY is required.")
             
-        self.client = genai.Client(api_key=self.api_key)
+        genai.configure(api_key=api_key)
         
-        # Use Gemini 1.5 Flash (Use explicit version to avoid 404)
-        self.model_name = 'gemini-1.5-flash-001'
+        # Matches PyDaily Email configuration
+        self.model_name = 'gemini-flash-latest'
+        self.model = genai.GenerativeModel(self.model_name)
         
     def _load_prompt(self, template_name: str) -> str:
         """Load a prompt template from prompts/ directory."""
@@ -111,17 +112,11 @@ class GeminiTextbook:
         return self._call_gemini(prompt)
 
     def _call_gemini(self, prompt: str) -> str:
-        """Call the API with retries using google-genai SDK."""
+        """Call the API with retries using legacy SDK."""
         try:
-            # Using the new SDK syntax
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt
-            )
-            
+            response = self.model.generate_content(prompt)
             if not response.text:
                 raise ValueError("Empty response from Gemini")
-                
             return response.text
         except Exception as e:
             logging.error(f"Gemini API Error: {e}")
