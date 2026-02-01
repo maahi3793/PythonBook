@@ -1,7 +1,7 @@
 
 import os
 import logging
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 # Load params
@@ -10,19 +10,19 @@ load_dotenv()
 class GeminiTextbook:
     """
     AI Content Generator for PythonBook.
-    Handles prompt loading and Gemini API calls.
+    Handles prompt loading and Gemini API calls (via google-genai SDK).
     """
     
     def __init__(self):
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
             logging.error("❌ GEMINI_API_KEY not found.")
             raise ValueError("GEMINI_API_KEY is required.")
             
-        genai.configure(api_key=api_key)
+        self.client = genai.Client(api_key=self.api_key)
         
-        # Use Gemini 1.5 Pro or Flash for long context
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        # Use Gemini 1.5 Flash (latest stable)
+        self.model_name = 'gemini-1.5-flash'
         
     def _load_prompt(self, template_name: str) -> str:
         """Load a prompt template from prompts/ directory."""
@@ -41,7 +41,6 @@ class GeminiTextbook:
         """Generate Part 1: Theory."""
         template = self._load_prompt("part1_theory.md")
         
-        # Simple string replacement (Jinja2 is overkill for this)
         prompt = template.replace("{{day}}", str(day)) \
                         .replace("{{topic}}", topic) \
                         .replace("{{lesson_content}}", lesson_content)
@@ -56,7 +55,6 @@ class GeminiTextbook:
         quiz_str = "No quiz data available."
         if quiz_data and 'questions' in quiz_data:
             import json
-            # If it's a string, load it. If list/dict, dump it nicely.
             q_obj = quiz_data['questions']
             if isinstance(q_obj, str):
                 try: q_obj = json.loads(q_obj)
@@ -113,14 +111,18 @@ class GeminiTextbook:
         return self._call_gemini(prompt)
 
     def _call_gemini(self, prompt: str) -> str:
-        """Call the API with retries."""
+        """Call the API with retries using google-genai SDK."""
         try:
-            response = self.model.generate_content(prompt)
-            # Basic validation
+            # Using the new SDK syntax
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
+            
             if not response.text:
                 raise ValueError("Empty response from Gemini")
+                
             return response.text
         except Exception as e:
             logging.error(f"Gemini API Error: {e}")
-            # In production, add retry logic here
             raise
