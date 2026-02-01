@@ -21,8 +21,8 @@ class GeminiTextbook:
             
         self.client = genai.Client(api_key=self.api_key)
         
-        # Use Gemini 1.5 Flash (latest stable)
-        self.model_name = 'gemini-1.5-flash'
+        # Use Gemini 1.5 Flash (Use explicit version to avoid 404)
+        self.model_name = 'gemini-1.5-flash-001'
         
     def _load_prompt(self, template_name: str) -> str:
         """Load a prompt template from prompts/ directory."""
