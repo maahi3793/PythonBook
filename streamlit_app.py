@@ -53,32 +53,28 @@ def main():
         st.error(f"❌ Failed to connect to Database: {e}")
         st.stop()
 
-    # 2. Add Custom CSS (Phase 5 Polish - adding early for basics)
-    st.markdown("""
-    <style>
-    .stAlert { margin-top: 1rem; }
-    h1 { color: #2c3e50; }
-    </style>
-    """, unsafe_allow_html=True)
+    # 2. Add Custom CSS
+    try:
+        from assets.book_style import get_book_styles
+        st.markdown(get_book_styles(), unsafe_allow_html=True)
+    except ImportError:
+        # Fallback if path issue
+        st.warning("⚠️ Could not load book styles.")
 
     # 3. Sidebar Navigation
     # Fetch chapters for sidebar efficiently
     chapters_meta = db.get_all_chapters_metadata()
-    mode, selected_day = render_sidebar(chapters_meta)
+    mode, selected_day = render_sidebar(chapters_meta, db)
     
     # 4. Main Content Router
+    # 4. Main Content Router
     if mode == "📖 Read Book":
-        if selected_day:
-            render_chapter_view(db, selected_day)
-        else:
-            st.title("📚 Welcome to PyTextbook Studio")
-            st.markdown("""
-            Select a **Chapter** from the sidebar to start reading.
+        # Initialize Current Day if not set
+        if 'current_day' not in st.session_state:
+            st.session_state['current_day'] = 1
             
-            - **⚪ Pending:** Not yet generated
-            - **🟡 Generated:** Partial or complete content
-            - **🟢 Reviwed:** Marked as final
-            """)
+        render_chapter_view(db, st.session_state['current_day'])
+
             
     elif mode == "🖼️ Manage Images":
         render_image_manager(db)

@@ -49,17 +49,29 @@ def main():
             try:
                 # Use generator's DB
                 res = generator.db.client.table("textbook_chapters") \
-                    .select("day") \
+                    .select("*") \
                     .order("day", desc=True) \
                     .limit(1) \
                     .execute()
                 
                 if res.data:
-                    last_day = res.data[0]['day']
-                    target_day = last_day + 1
+                    last_ch = res.data[0]
+                    last_day = last_ch['day']
+                    
+                    # Check Completeness (Parts 1, 2, 3)
+                    p1 = last_ch.get('content_part1_theory')
+                    p2 = last_ch.get('content_part2_practice')
+                    p3 = last_ch.get('content_part3_mentor')
+                    
+                    if p1 and p2 and p3:
+                        target_day = last_day + 1
+                        logging.info(f"✅ Day {last_day} Complete. advancing to Day {target_day}.")
+                    else:
+                        target_day = last_day
+                        logging.info(f"⚠️ Day {last_day} Incomplete (P1={bool(p1)}, P2={bool(p2)}, P3={bool(p3)}). Retrying Day {target_day}.")
                 else:
                     target_day = 1 # Start fresh
-                logging.info(f"👉 Auto-Detected Next Day: {target_day}")
+                logging.info(f"👉 Auto-Detected Target Day: {target_day}")
             except Exception as e:
                 logging.error(f"❌ Auto-detection failed: {e}")
                 sys.exit(1)

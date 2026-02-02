@@ -238,11 +238,13 @@ class TextbookDB:
                     if "Quiz" in topic and "Project" not in topic:
                         continue # Skip
                     
-                    # Also ensure it's within range 1-179 just in case
-                    if 1 <= day <= 179:
+                    # Also ensure it's within range 0-179 (0 = Preface)
+                    if 0 <= day <= 179:
                         valid_days.append(day)
             
             # Use set to ensure uniqueness if DB has dupes, then sort
+            # Manually ensure Day 0 (Preface) is included
+            valid_days.append(0)
             return sorted(list(set(valid_days)))
             
         except Exception as e:
