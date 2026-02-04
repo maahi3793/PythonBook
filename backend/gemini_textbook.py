@@ -111,6 +111,55 @@ class GeminiTextbook:
                         
         return self._call_gemini(prompt)
 
+    def generate_exercise_batch(self, topic: str, difficulty: str, count: int, xp_reward: int) -> str:
+        """Generate a batch of exercises."""
+        template = self._load_prompt("batch_exercises.md")
+        
+        prompt = template.replace("{{topic}}", topic) \
+                        .replace("{{difficulty}}", difficulty) \
+                        .replace("{{count}}", str(count)) \
+                        .replace("{{xp_reward}}", str(xp_reward))
+                        
+        return self._call_gemini(prompt)
+
+
+    def generate_assessment_part1(self, day: int, topic: str, context: str) -> str:
+        """Generate Assessment Part 1: Warmup."""
+        template = self._load_prompt("assessment_part1.md")
+        # Find prev topics? Simplified for now.
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic).replace("{{context}}", context)
+        return self._call_gemini(prompt)
+
+    def generate_assessment_part2(self, day: int, topic: str, context: str) -> str:
+        """Generate Assessment Part 2: Gauntlet."""
+        template = self._load_prompt("assessment_part2.md")
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic).replace("{{context}}", context)
+        return self._call_gemini(prompt)
+
+    def generate_assessment_part3(self, day: int, topic: str, context: str) -> str:
+        """Generate Assessment Part 3: Interview."""
+        template = self._load_prompt("assessment_part3.md")
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic).replace("{{context}}", context)
+        return self._call_gemini(prompt)
+
+    def generate_assessment_part1(self, day: int, topic: str) -> str:
+        """Generate Assessment Part 1: Warmup."""
+        template = self._load_prompt("assessment_part1.md")
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
+        return self._call_gemini(prompt)
+
+    def generate_assessment_part2(self, day: int, topic: str) -> str:
+        """Generate Assessment Part 2: Gauntlet."""
+        template = self._load_prompt("assessment_part2.md")
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
+        return self._call_gemini(prompt)
+
+    def generate_assessment_part3(self, day: int, topic: str) -> str:
+        """Generate Assessment Part 3: Interview."""
+        template = self._load_prompt("assessment_part3.md")
+        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
+        return self._call_gemini(prompt)
+
     def _call_gemini(self, prompt: str) -> str:
         """Call the API with retries using legacy SDK."""
         try:

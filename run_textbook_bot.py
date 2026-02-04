@@ -28,7 +28,9 @@ def main():
     parser = argparse.ArgumentParser(description='PythonBook Content Generator')
     
     parser.add_argument('--day', type=str, help="Day number (1-179) or 'auto'")
-    parser.add_argument('--part', type=str, choices=['part1', 'part2', 'part3', 'all'], default='all')
+    parser.add_argument('--part', type=str, default='all', 
+        help="Content part to generate: part1, part2, part3, all, batch_easy, batch_medium, batch_hard, batch_scenario, batch_all"
+    )
     parser.add_argument('--weekly', type=int, help='Generate weekly summary (Placeholder)')
     parser.add_argument('--final', action='store_true', help='Generate final chapter (Placeholder)')
     
@@ -49,28 +51,34 @@ def main():
             try:
                 # Use generator's DB
                 res = generator.db.client.table("textbook_chapters") \
-                    .select("*") \
-                    .order("day", desc=True) \
-                    .limit(1) \
+                    .select("day, content_part1_theory") \
+                    .order("day", desc=False) \
                     .execute()
                 
-                if res.data:
-                    last_ch = res.data[0]
-                    last_day = last_ch['day']
-                    
-                    # Check Completeness (Parts 1, 2, 3)
-                    p1 = last_ch.get('content_part1_theory')
-                    p2 = last_ch.get('content_part2_practice')
-                    p3 = last_ch.get('content_part3_mentor')
-                    
-                    if p1 and p2 and p3:
-                        target_day = last_day + 1
-                        logging.info(f"✅ Day {last_day} Complete. advancing to Day {target_day}.")
-                    else:
-                        target_day = last_day
-                        logging.info(f"⚠️ Day {last_day} Incomplete (P1={bool(p1)}, P2={bool(p2)}, P3={bool(p3)}). Retrying Day {target_day}.")
+                rows = res.data
+                existing_days = {r['day']: r for r in rows}
+                
+                # Logic: Find the first day that is EITHER missing OR incomplete
+                found_target = None
+                max_checked_day = 0
+                
+                if not rows:
+                     found_target = 1
                 else:
-                    target_day = 1 # Start fresh
+                    max_day_in_db = rows[-1]['day']
+                    for d in range(1, max_day_in_db + 2): 
+                        if d not in existing_days:
+                            found_target = d
+                            logging.info(f"🔍 Gap detected at Day {d}. Filling gap.")
+                            break
+                        # We skip completeness check for 'auto' simpler logic for now
+                        # or we keep it. Use simple "Next Day" logic
+                        
+                if found_target:
+                    target_day = found_target
+                else:
+                    target_day = 1 
+                
                 logging.info(f"👉 Auto-Detected Target Day: {target_day}")
             except Exception as e:
                 logging.error(f"❌ Auto-detection failed: {e}")
@@ -82,7 +90,28 @@ def main():
                 logging.error(f"Invalid day: {args.day}")
                 sys.exit(1)
         
-        result = generator.generate_day(target_day, args.part)
+        # ROUTING LOGIC
+        if args.part.startswith('batch_'):
+            # It is a Q35 batch
+            from backend.curriculum import TOPICS
+            topic = TOPICS.get(target_day, f"Day {target_day}")
+            
+            batch_map = {
+                'batch_easy': 'Easy',
+                'batch_medium': 'Medium',
+                'batch_hard': 'Hard',
+                'batch_scenario': 'Scenario',
+                'batch_all': None
+            }
+            target_batch = batch_map.get(args.part)
+            
+            logging.info(f"🚀 Triggering Q35: Day {target_day}, Topic: {topic}, Batch: {target_batch}")
+            result = generator.generate_daily_q35(target_day, topic, target_batch)
+            
+        else:
+            # Standard Textbook Parts
+            result = generator.generate_day(target_day, args.part)
+
         if result['success']:
             logging.info(f"✅ Success: {result['message']}")
         else:

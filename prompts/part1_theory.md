@@ -11,6 +11,12 @@ You are writing a computer science textbook chapter.
 ## TASK
 Write a comprehensive theory section. This should feel like reading a university textbook - thorough, precise, but still accessible.
 
+**CRITICAL INSTRUCTION:**
+Start your response with EXACTLY this line:
+`# {{topic}}`
+
+Do NOT add "Day X" or any other creative title. Use the exact topic provided.
+
 ## OUTPUT STRUCTURE
 
 ### What You'll Learn

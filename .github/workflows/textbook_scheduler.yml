@@ -1,111 +1,114 @@
-name: Textbook Content Generator
+name: Textbook Content Scheduler (8-Cycle)
 
 on:
   schedule:
-    # 1. Part 1 (Theory): 16:30 UTC (2 hours after PyDaily Evening email)
-    - cron: '30 16 * * *'
-    # 2. Part 2 (Practice): 17:30 UTC
-    - cron: '30 17 * * *'
-    # 3. Part 3 (Mentor): 18:30 UTC
-    - cron: '30 18 * * *'
-    # 4. Weekly Summary: 19:30 UTC (Saturday)
-    - cron: '30 19 * * 6'
+    # 1. 02:00 UTC - Theory
+    - cron: '0 2 * * *'
+    # 2. 05:00 UTC - Practice
+    - cron: '0 5 * * *'
+    # 3. 08:00 UTC - Mentor
+    - cron: '0 8 * * *'
+    # 4. 11:00 UTC - Q35 Easy
+    - cron: '0 11 * * *'
+    # 5. 14:00 UTC - Q35 Medium
+    - cron: '0 14 * * *'
+    # 6. 17:00 UTC - Q35 Hard
+    - cron: '0 17 * * *'
+    # 7. 20:00 UTC - Q35 Scenario
+    - cron: '0 20 * * *'
+    # 8. 23:00 UTC - Maintenance/Top-Up
+    - cron: '0 23 * * *'
+
   workflow_dispatch:
     inputs:
-      action:
-        description: Choose what to generate
+      part:
+        description: 'Choose Part to Run'
         required: true
-        default: all
+        default: 'part1'
         type: choice
         options:
-          - all
-          - part1
-          - part2
-          - part3
-          - weekly
-          - final
-      day:
-        description: Day number (1-179)
-        required: false
-        default: '1'
-        type: string
+        - part1
+        - part2
+        - part3
+        - batch_easy
+        - batch_medium
+        - batch_hard
+        - batch_scenario
+        - maintenance
 
 jobs:
-  generate-content:
+  run-textbook:
     runs-on: ubuntu-latest
+    
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
+          
       - name: Install Dependencies
         run: pip install -r requirements.txt
-
-      - name: Install Pandoc
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc wkhtmltopdf
-
-      - name: Run Generator
+      
+      # 🕰️ DETERMINE PART BASED ON TIME (or Manual Input)
+      - name: Determine Run Part
+        id: mode
         shell: python
         run: |
           import os
           import datetime
+          import sys
           
-          # Get inputs from environment variables (set by GitHub Actions)
-          event_name = os.getenv("GITHUB_EVENT_NAME")
+          # 1. Manual Trigger
+          event_name = "${{ github.event_name }}"
+          manual_part = "${{ github.event.inputs.part }}"
           
-          mode = "all"
-          day = "1"
-          
-          # GitHub context access via templating in the python script string
-          # We pass these as args to avoid syntax issues
-          raw_action = "${{ github.event.inputs.action }}"
-          raw_day = "${{ github.event.inputs.day }}"
+          part = ""
           
           if event_name == "workflow_dispatch":
-              mode = raw_action if raw_action else "all"
-              day = raw_day if raw_day else "1"
-          
+              print(f"🔹 Manual Trigger: {manual_part}")
+              part = manual_part
+              
           elif event_name == "schedule":
               now = datetime.datetime.utcnow()
               hour = now.hour
-              print(f"Schedule Trigger. UTC Hour: {hour}")
+              print(f"🔹 Schedule Trigger. UTC Hour: {hour}")
               
-              # New Schedule Logic: 16:30, 17:30, 18:30, 19:30
-              if 16 <= hour < 17:
-                  mode = "part1"  # 16:30 UTC
-              elif 17 <= hour < 18:
-                  mode = "part2"  # 17:30 UTC
-              elif 18 <= hour < 19:
-                  mode = "part3"  # 18:30 UTC
-              elif hour >= 19:
-                  mode = "weekly" # 19:30 UTC
+              # Map Hour to Part (Allowing 1hr variance)
+              if 1 <= hour <= 3:
+                  part = "part1"      # 02:00
+              elif 4 <= hour <= 6:
+                  part = "part2"      # 05:00
+              elif 7 <= hour <= 9:
+                  part = "part3"      # 08:00
+              elif 10 <= hour <= 12:
+                  part = "batch_easy" # 11:00
+              elif 13 <= hour <= 15:
+                  part = "batch_medium" # 14:00
+              elif 16 <= hour <= 18:
+                  part = "batch_hard"   # 17:00
+              elif 19 <= hour <= 21:
+                  part = "batch_scenario" # 20:00
+              elif 22 <= hour <= 23:
+                  part = "maintenance"    # 23:00
+          
+          if not part:
+              print("❌ Could not determine part from time.")
+              sys.exit(1)
               
-              day = "auto"
+          print(f"✅ Selected Part: {part}")
           
-          print(f"Running generator with Mode: {mode}, Day: {day}")
-          
-          import subprocess
-          
-          cmd = ["python", "run_textbook_bot.py"]
-          
-          if mode == "weekly":
-              cmd.extend(["--weekly", "1"])
-          elif mode == "final":
-              cmd.extend(["--final"])
-          elif mode == "all":
-              cmd.extend(["--day", day, "--part", "all"])
-          else:
-              cmd.extend(["--day", day, "--part", mode])
-              
-          subprocess.run(cmd, check=True)
+          # Write to GITHUB_ENV
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write(f"TARGET_PART={part}\n")
+
+      # 🚀 EXECUTE BOT
+      - name: Run Textbook Bot
+        if: env.TARGET_PART != ''
+        run: python run_textbook_bot.py --day auto --part ${{ env.TARGET_PART }}

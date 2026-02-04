@@ -217,8 +217,8 @@ def render_chapter_view(db: TextbookDB, day: int):
             _render_markdown_with_images(content, day, db)
             with st.expander("⚙️ Admin: Regenerate Part 3"):
                 if st.button("🔄 Regenerate Mentor", key="regen_p3"):
-                     _run_generation(day, 'part3')
-                     st.rerun()
+                     if _run_generation(day, 'part3'):
+                         st.rerun()
         else:
             st.info("Part 3 generation pending.")
             if st.button("🚀 Generate Mentor", key="gen_p3"):
