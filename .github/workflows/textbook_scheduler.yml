@@ -14,10 +14,10 @@ on:
     - cron: '0 14 * * *'
     # 6. 17:00 UTC - Q35 Hard
     - cron: '0 17 * * *'
-    # 7. 20:00 UTC - Q35 Scenario
-    - cron: '0 20 * * *'
-    # 8. 23:00 UTC - Maintenance/Top-Up
-    - cron: '0 23 * * *'
+    # 7. 20:00 UTC - Q35 Scenario (DISABLED - Placeholder)
+    # - cron: '0 20 * * *'
+    # 8. 23:00 UTC - Maintenance/Top-Up (DISABLED - Placeholder)
+    # - cron: '0 23 * * *'
 
   workflow_dispatch:
     inputs:

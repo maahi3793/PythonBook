@@ -1,0 +1,160 @@
+📉 Starting Deep Audit of 147 rows...
+------------------------------------------------------------
+ID                                     | Day | Source     | Status
+------------------------------------------------------------
+15be4380-80bb-47fe-a4d3-9cd4372b1744   | 4   | boss_battl | ✅ OK
+8f6b955c-14c7-4e05-b597-07fcd6b602f9   | 4   | boss_battl | ✅ OK
+066590de-15ec-4e44-94ea-de6bc2d60c7d   | 5   | boss_battl | ✅ OK
+0c385d7a-e8b0-4a65-87c9-0e402ad76f81   | 5   | boss_battl | ✅ OK
+b9f12ccd-8fc5-438d-9054-cd540cdc90c5   | 1   | boss_battl | ✅ OK
+3f2e5e30-3b0b-4a66-bb16-f68fe3502d20   | 1   | boss_battl | ✅ OK
+38605d7c-8348-46fe-965f-1d755d15d4fe   | 6   | boss_battl | ✅ OK
+0018d4bc-bc9f-4db8-b6a9-2ef02c9a1ed9   | 5   | boss_battl | ✅ OK
+09ed84b9-67c4-4c35-88c7-e1dbcfd0f0de   | 2   | boss_battl | ✅ OK
+e83c544d-3cb2-4e48-8932-176e0eacd74e   | 7   | boss_battl | ✅ OK
+e31ec0a2-3f9d-4aa0-987e-99ac65f7eb0b   | 7   | boss_battl | ✅ OK
+b064c993-2df3-4265-bf16-38a46c6cb8e7   | 8   | boss_battl | ✅ OK
+08eb11e6-23d8-4bbc-b356-84eaad74961d   | 3   | boss_battl | ✅ OK
+d9fa4226-ad92-4b16-bb1b-81949246b6a8   | 9   | boss_battl | ✅ OK
+1c665e06-a9e7-4e27-a5d4-0e34db06bcc1   | 3   | textbook   | ✅ OK
+b28599b7-3d63-4856-b540-840231ca4ddb   | 10  | boss_battl | ✅ OK
+55b54f5c-7f7a-49fa-a4c9-985bb404b076   | 10  | boss_battl | ✅ OK
+da8e1fd5-202a-4109-8a60-92d39741a216   | 12  | boss_battl | ✅ OK
+ff1fb150-5f9f-4403-bda8-cd8c28b1abeb   | 12  | boss_battl | ❌ No Starter, No Solution, No Test
+c7895ece-d190-46c5-aba2-849ec8ddbe11   | 13  | boss_battl | ❌ No Starter, No Solution, No Test
+adb894de-fe24-4762-aff6-05a7575502df   | 13  | boss_battl | ❌ No Starter, No Solution, No Test
+cb5b6090-e84a-475d-bd77-d65293badb4c   | 13  | boss_battl | ❌ No Starter, No Solution, No Test
+178fd1aa-2896-4077-8d70-e7662dbff6f4   | 13  | boss_battl | ❌ No Starter, No Solution, No Test
+5340b36b-aed7-47b7-be30-5a0446d481c6   | 13  | boss_battl | ✅ OK
+dfed3e9b-f5b5-4409-9ad1-dedba813ec89   | 14  | boss_battl | ❌ No Starter, No Solution, No Test
+62cc6961-4df6-4a12-a814-250972531d17   | 14  | boss_battl | ❌ No Starter, No Solution, No Test
+2acfa8ec-c9e1-4b51-a200-97849b8a6a38   | 14  | boss_battl | ❌ No Starter, No Solution, No Test
+580a19dd-9800-4556-baa3-2961dea38a60   | 14  | boss_battl | ❌ No Starter, No Solution, No Test
+0ec3a9a3-dba7-4298-8d16-026f15c89051   | 14  | boss_battl | ❌ No Starter, No Solution, No Test
+e9510d1d-d41a-47f0-8754-499f47919802   | 15  | boss_battl | ❌ No Starter, No Solution, No Test
+765ab85f-b2cd-48dd-a8a5-3502b19c2fcb   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+d3fe68df-1202-4ef8-8d26-c3e5893876e1   | 15  | boss_battl | ❌ No Starter, No Solution, No Test
+90ac1125-0562-4d21-a1ca-05a2b40fc604   | 15  | boss_battl | ❌ No Starter, No Solution, No Test
+02e44250-c3b7-4737-baa9-6bfe6d5c0efc   | 15  | boss_battl | ❌ No Starter, No Solution, No Test
+c4ecb128-ec42-4d69-ba15-aea876f5b6e8   | 15  | boss_battl | ❌ No Starter, No Solution, No Test
+194bb378-b807-4ae2-b3c4-db59dcfc67b0   | 16  | boss_battl | ❌ No Starter, No Solution, No Test
+038f1eac-46f9-446b-ad81-4d50bb140e84   | 16  | boss_battl | ❌ No Starter, No Solution, No Test
+ff0bcf09-bc69-411b-85e3-e9271cfdda2e   | 16  | boss_battl | ❌ No Starter, No Solution, No Test
+64247c4c-c2cd-46cc-99ca-6f0c9b41e325   | 16  | boss_battl | ❌ No Starter, No Solution, No Test
+44d2b5ee-b05c-4984-b78b-a20468f0314c   | 16  | boss_battl | ❌ No Starter, No Solution, No Test
+f5d458e2-2036-4c06-8615-ce6dd0dce461   | 17  | boss_battl | ❌ No Starter, No Solution, No Test
+ace0adea-f3d8-4992-90eb-1c391a2883d2   | 17  | boss_battl | ❌ No Starter, No Solution, No Test
+089d43a6-f9a5-4ba8-881d-35027a5f8d2b   | 17  | boss_battl | ❌ No Starter, No Solution, No Test
+342cf0cf-895d-4e8b-a59f-d3797ce2d680   | 17  | boss_battl | ❌ No Starter, No Solution, No Test
+447a59a3-888c-46b4-81ff-6f396c139ff4   | 17  | boss_battl | ❌ No Starter, No Solution, No Test
+5f2e6160-0a7c-4761-ab9f-052f9c1d738d   | 1   | textbook   | ✅ OK
+6f2ab40d-011c-49bf-adba-b64cb42acbb4   | 18  | boss_battl | ❌ No Starter, No Solution, No Test
+550f7dea-f031-4a5b-a4e5-437f4217b096   | 18  | boss_battl | ❌ No Starter, No Solution, No Test
+9ce8ecb3-9f6b-41a1-bbf6-d2e913043674   | 18  | boss_battl | ❌ No Starter, No Solution, No Test
+53986632-f345-44f0-b41b-d2571028075e   | 18  | boss_battl | ❌ No Starter, No Solution, No Test
+124b12a1-0674-485e-8203-40193b3b16f0   | 18  | boss_battl | ❌ No Starter, No Solution, No Test
+5647385b-7842-4fb5-9504-8529dcf53d1a   | 19  | boss_battl | ❌ No Starter, No Solution, No Test
+750bac1f-93c7-413d-88e3-b208788f7405   | 19  | boss_battl | ❌ No Starter, No Solution, No Test
+f64228f1-0996-491c-8cb3-d890c5693ade   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+343da879-7e66-43f4-ac15-f8dc1831a636   | 19  | boss_battl | ❌ No Starter, No Solution, No Test
+575d510b-7efb-4b5d-bfd7-94cf38bb8cf2   | 19  | boss_battl | ❌ No Starter, No Solution, No Test
+4f1e1a8a-088a-4624-814d-f041e4b50667   | 19  | boss_battl | ❌ No Starter, No Solution, No Test
+ffe94163-909e-4afe-80e1-9dd16c522eb0   | 20  | boss_battl | ❌ No Starter, No Solution, No Test
+b6aa0e36-6333-4ac3-82a8-794f3596bb45   | 20  | boss_battl | ❌ No Starter, No Solution, No Test
+33b756a8-bbf1-4b5a-8b58-351216b0bcd3   | 20  | boss_battl | ❌ No Starter, No Solution, No Test
+9d93141c-6ab7-4208-a48a-ff497c4ab311   | 20  | boss_battl | ❌ No Starter, No Solution, No Test
+c008e276-94bd-4764-9642-bfbb0ab55e77   | 20  | boss_battl | ❌ No Starter, No Solution, No Test
+238ba924-5fc1-4df3-86d1-c4e678eebf94   | 11  | boss_battl | ❌ No Starter, No Solution, No Test
+bca95407-96eb-4213-ad03-02aabdf4e833   | 11  | boss_battl | ❌ No Starter, No Solution, No Test
+7e6bf6cb-0a80-4dcb-b2f3-08cee071791d   | 11  | boss_battl | ❌ No Starter, No Solution, No Test
+2e9e0d2d-7ecb-4bed-8e15-5ec93b7407d9   | 11  | boss_battl | ❌ No Starter, No Solution, No Test
+dcf7a763-e2cc-4f01-88fe-d52107295b66   | 11  | boss_battl | ❌ No Starter, No Solution, No Test
+11c0d5dc-e2a4-4790-ac33-aaaf6157f5b0   | 21  | boss_battl | ❌ No Starter, No Solution, No Test
+e2cd98df-e48d-4b7b-8448-12b76c4d9762   | 21  | boss_battl | ❌ No Starter, No Solution, No Test
+7fe8afb7-2bf5-4112-ad77-be831808775f   | 21  | boss_battl | ❌ No Starter, No Solution, No Test
+233f924a-40bd-4ef2-91fb-cef7ed924bbc   | 21  | boss_battl | ❌ No Starter, No Solution, No Test
+653d781f-6a5a-47b8-8e7b-b4642608b4cb   | 21  | boss_battl | ❌ No Starter, No Solution, No Test
+23c81016-af5a-4f8c-a2b7-169e6a8eed66   | 22  | boss_battl | ❌ No Starter, No Solution, No Test
+0ff3db66-569f-4195-8b88-25cdf33341f7   | 22  | boss_battl | ❌ No Starter, No Solution, No Test
+d5600f81-9902-42d3-be24-871cb1f98be5   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+84027248-2b03-48c6-8e52-fff3bad1413a   | 22  | boss_battl | ❌ No Starter, No Solution, No Test
+9a430a41-a257-4635-8ac7-e15b0f7fa3af   | 22  | boss_battl | ❌ No Starter, No Solution, No Test
+6e0c432a-220b-49b9-8240-450fce62a239   | 22  | boss_battl | ❌ No Starter, No Solution, No Test
+287a91f1-7cbc-4e21-ab88-5a91a6a3d8c1   | 23  | boss_battl | ❌ No Starter, No Solution, No Test
+ed1571a2-6318-4dc8-b6f5-c966f3ef5855   | 23  | boss_battl | ❌ No Starter, No Solution, No Test
+353a9c2a-7c7f-4109-b41d-1492d33c7ae7   | 23  | boss_battl | ❌ No Starter, No Solution, No Test
+efee3bd2-36b9-42c3-b6f9-ca8612d3582b   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+f55fceda-8099-4766-b094-7a6b7f58585c   | 23  | boss_battl | ❌ No Starter, No Solution, No Test
+341169e3-2e02-4301-bdd4-366fdc0cc010   | 23  | boss_battl | ❌ No Starter, No Solution, No Test
+10ad15c5-7d8b-4ba5-82ae-b888e5104449   | 24  | boss_battl | ❌ No Starter, No Solution, No Test
+1ce4e85c-8f10-4d29-ab1e-bda20d1dd889   | 24  | boss_battl | ❌ No Starter, No Solution, No Test
+d6c6939f-149d-40b1-8b29-a323e167a02c   | 24  | boss_battl | ❌ No Starter, No Solution, No Test
+41df280c-6967-4050-8298-16440e35a13e   | 24  | boss_battl | ❌ No Starter, No Solution, No Test
+627f702d-6d3d-4eb9-9b5d-baf44ec07c43   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+ba780391-fd9b-4053-b8a2-cd6094e26b00   | 24  | boss_battl | ❌ No Starter, No Solution, No Test
+81faf732-f359-466e-a998-6d8bb8f85ef5   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+cd7dc712-f5c0-4a3e-8db9-674aff986f7f   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+92772536-1d07-4d2c-8c0a-35a9d0e1dbd6   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+d37e38c8-6e00-42e1-812d-571ca089abf0   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+e1e4070b-f19f-4d98-9cce-a523fbcda02f   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+59ee34d6-44cd-44ae-8e5a-b61b6d8a852d   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+9d4eff4d-0811-4044-95b2-0e0cdda87301   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+6472efd5-9b6c-48bf-ac08-88c89753eeac   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+790d0eb5-adb9-4081-a370-a16d5f9544b4   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+8deca946-ee82-4a77-99ab-c326427dfe73   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+12ed5bc0-4ab3-460a-ba65-3a5372c26cae   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+5398c8cd-558a-4174-8e91-9ec7d6792111   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+4f3e97b6-b2f6-472c-9a91-f8a9edb9b9e1   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+d776ce3d-0dbf-4ff3-8f98-9349f947d74c   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+8c653329-486a-4efc-860d-91c88c97f8f8   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+1d70105d-3094-4e2b-b8fe-c1e80063b3a7   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+b15ca527-e47b-4d8b-9e3f-8aa3455a3471   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+1a634399-303b-4d19-b9d3-758ea7d39fae   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+2109d521-a3cf-4cce-ab1a-233808617db3   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+ca722f3e-e62e-4796-838d-1b4e3b9d0285   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+8c88266c-12ad-4cbb-af32-e29d72c8f9d7   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+dbf33aa9-0ae2-4c8a-8586-4c1334971637   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+88beb2cc-622b-453f-8297-75b71dfaf76f   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+08135a69-6bd5-4ff5-a4da-5c0616e0a5c0   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+443ff174-3a12-49f5-9db9-52aa162c91c4   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+2cc8d3b3-1a1a-4bea-878f-3f5268a346ef   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+d2fba33a-94ba-4974-9764-32ea9738bd23   | 3   | textbook   | ❌ No Starter, No Solution, No Test
+98611072-026c-40b7-88e8-296675f1d361   | 4   | boss_battl | ✅ OK
+a5932b2d-7ed7-4142-9ea3-0f2420822e0d   | 4   | boss_battl | ✅ OK
+e9870037-112d-4ced-85c7-d6a642e29089   | 4   | boss_battl | ✅ OK
+819f4b35-9e45-4587-9001-5a7ccc3126d9   | 5   | boss_battl | ✅ OK
+6f4ae800-d2cb-4c3c-a06a-01b7156e6ddc   | 1   | textbook   | ✅ OK
+e1a85b31-679c-46ea-a81d-5cd82392fc43   | 2   | boss_battl | ✅ OK
+7dc4afc4-b06f-4866-b94e-458176bc9329   | 1   | boss_battl | ✅ OK
+54759fa4-9f33-4229-b266-d411d595e5e2   | 6   | boss_battl | ✅ OK
+55949fc7-4d87-45a7-a5e6-74497ccf53e1   | 6   | boss_battl | ✅ OK
+3571f1a7-8852-4f68-8c19-9169eadde790   | 8   | boss_battl | ✅ OK
+c97d8ae2-db88-4186-9c76-c3d1ff2a4f64   | 2   | boss_battl | ✅ OK
+4db63eec-fa8a-4bf0-b48d-2b54c4f935dd   | 5   | boss_battl | ✅ OK
+f348c182-ad65-499c-8fa6-435ea5e3b4d3   | 7   | boss_battl | ✅ OK
+f0a7fc5d-9b8c-4fbd-8dec-ce7b1b738774   | 8   | boss_battl | ✅ OK
+59f0a4a4-92c1-4bc2-9dd3-3e0d1c9697ca   | 1   | textbook   | ✅ OK
+884e3116-8eeb-4729-98dc-8f8582449b24   | 3   | boss_battl | ✅ OK
+88737b01-99cc-40c7-b17d-8bc7271ba340   | 3   | boss_battl | ✅ OK
+62a40c20-d40d-4de1-9fec-cb53d4d7d498   | 9   | boss_battl | ✅ OK
+b1694fdc-35d5-4a97-adf8-6067d71f7b44   | 9   | boss_battl | ✅ OK
+9e7e3c3d-142c-402f-a0ee-f7d44624b2db   | 10  | boss_battl | ✅ OK
+8baf0d18-9b47-4a61-bdab-637d6690d7fe   | 12  | boss_battl | ✅ OK
+cb897a65-58e3-4af3-a46d-c1a2d308c80e   | 12  | boss_battl | ✅ OK
+1c942d2b-2ade-4cd8-8a78-c4354812fc94   | 12  | boss_battl | ✅ OK
+65757344-6ebf-49fa-b405-2d8d779c2744   | 1   | textbook   | ✅ OK
+71df1689-fb50-4b82-8456-44ab95361740   | 1   | textbook   | ✅ OK
+d5bdb072-0ddc-4fdd-b30d-1f9eff78956f   | 1   | textbook   | ✅ OK
+6b67378c-a8d1-42a1-901a-5a6d96229fed   | 1   | textbook   | ✅ OK
+d5a23de6-12b1-494a-8e1b-7bad10b07958   | 1   | textbook   | ✅ OK
+a61a0c37-4c46-4b9b-9992-718b18b82472   | 1   | textbook   | ✅ OK
+de09d928-e738-4c34-acbd-74f6930485f7   | 1   | textbook   | ✅ OK
+------------------------------------------------------------
+📊 SUMMARY
+Total Rows: 147
+Rows with Issues: 97
+  - Legacy/Unknown Source: 65
+  - Textbook (Q35) Source: 32
+Total Missing Starter: 0
+Total Missing Solution: 0
+------------------------------------------------------------
