@@ -15,6 +15,7 @@ import os
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # Allow sibling imports
 
 from backend.generator import TextbookGenerator
 
@@ -49,9 +50,9 @@ def main():
         if args.day == 'auto':
             logging.info("🤖 Auto-Detecting Day...")
             try:
-                # Use generator's DB
+                # Use generator's DB - fetch all parts to check completeness
                 res = generator.db.client.table("textbook_chapters") \
-                    .select("day, content_part1_theory") \
+                    .select("day, content_part1_theory, content_part2_practice, content_part3_mentor") \
                     .order("day", desc=False) \
                     .execute()
                 
@@ -60,19 +61,30 @@ def main():
                 
                 # Logic: Find the first day that is EITHER missing OR incomplete
                 found_target = None
-                max_checked_day = 0
                 
                 if not rows:
                      found_target = 1
                 else:
                     max_day_in_db = rows[-1]['day']
-                    for d in range(1, max_day_in_db + 2): 
-                        if d not in existing_days:
-                            found_target = d
-                            logging.info(f"🔍 Gap detected at Day {d}. Filling gap.")
-                            break
-                        # We skip completeness check for 'auto' simpler logic for now
-                        # or we keep it. Use simple "Next Day" logic
+                    
+                    # PRIORITY 1: Find incomplete days (exists but missing P1 or P3)
+                    for d in range(1, max_day_in_db + 1):
+                        if d in existing_days:
+                            row = existing_days[d]
+                            has_p1 = bool(row.get('content_part1_theory'))
+                            has_p3 = bool(row.get('content_part3_mentor'))
+                            if not has_p1 or not has_p3:
+                                found_target = d
+                                logging.info(f"🔧 Incomplete Day {d} detected (P1={has_p1}, P3={has_p3}). Completing it.")
+                                break
+                    
+                    # PRIORITY 2: Find gaps (missing days entirely)
+                    if not found_target:
+                        for d in range(1, max_day_in_db + 2): 
+                            if d not in existing_days:
+                                found_target = d
+                                logging.info(f"🔍 Gap detected at Day {d}. Filling gap.")
+                                break
                         
                 if found_target:
                     target_day = found_target
@@ -93,7 +105,7 @@ def main():
         # ROUTING LOGIC
         if args.part.startswith('batch_'):
             # It is a Q35 batch
-            from backend.curriculum import TOPICS
+            from PyDailyEmail.backend.curriculum import TOPICS
             topic = TOPICS.get(target_day, f"Day {target_day}")
             
             batch_map = {
