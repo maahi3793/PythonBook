@@ -1,114 +1,72 @@
-name: Textbook Content Scheduler (8-Cycle)
+name: PythonBook Textbook Scheduler
 
 on:
   schedule:
-    # 1. 02:00 UTC - Theory
-    - cron: '0 2 * * *'
-    # 2. 05:00 UTC - Practice
-    - cron: '0 5 * * *'
-    # 3. 08:00 UTC - Mentor
-    - cron: '0 8 * * *'
-    # 4. 11:00 UTC - Q35 Easy
-    - cron: '0 11 * * *'
-    # 5. 14:00 UTC - Q35 Medium
-    - cron: '0 14 * * *'
-    # 6. 17:00 UTC - Q35 Hard
-    - cron: '0 17 * * *'
-    # 7. 20:00 UTC - Q35 Scenario (DISABLED - Placeholder)
-    # - cron: '0 20 * * *'
-    # 8. 23:00 UTC - Maintenance/Top-Up (DISABLED - Placeholder)
-    # - cron: '0 23 * * *'
+    # Schedule (UTC) -> IST (+5:30)
+    # 17:30 UTC -> 11:00 PM IST (Daily Full Generation)
+    - cron: '30 17 * * *'
 
   workflow_dispatch:
     inputs:
-      part:
-        description: 'Choose Part to Run'
+      day:
+        description: 'Day to generate (number or "auto")'
         required: true
-        default: 'part1'
+        default: 'auto'
+      part:
+        description: 'Part to generate (part1, part2, part3, summary, all)'
+        required: true
+        default: 'all'
         type: choice
         options:
+        - all
         - part1
         - part2
         - part3
-        - batch_easy
-        - batch_medium
-        - batch_hard
-        - batch_scenario
-        - maintenance
+        - summary
 
 jobs:
-  run-textbook:
+  generate-textbook:
     runs-on: ubuntu-latest
-    
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up Python
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-          
-      - name: Install Dependencies
-        run: pip install -r requirements.txt
-      
-      # 🕰️ DETERMINE PART BASED ON TIME (or Manual Input)
-      - name: Determine Run Part
-        id: mode
-        shell: python
-        run: |
-          import os
-          import datetime
-          import sys
-          
-          # 1. Manual Trigger
-          event_name = "${{ github.event_name }}"
-          manual_part = "${{ github.event.inputs.part }}"
-          
-          part = ""
-          
-          if event_name == "workflow_dispatch":
-              print(f"🔹 Manual Trigger: {manual_part}")
-              part = manual_part
-              
-          elif event_name == "schedule":
-              now = datetime.datetime.utcnow()
-              hour = now.hour
-              print(f"🔹 Schedule Trigger. UTC Hour: {hour}")
-              
-              # Map Hour to Part (Allowing 1hr variance)
-              if 1 <= hour <= 3:
-                  part = "part1"      # 02:00
-              elif 4 <= hour <= 6:
-                  part = "part2"      # 05:00
-              elif 7 <= hour <= 9:
-                  part = "part3"      # 08:00
-              elif 10 <= hour <= 12:
-                  part = "batch_easy" # 11:00
-              elif 13 <= hour <= 15:
-                  part = "batch_medium" # 14:00
-              elif 16 <= hour <= 18:
-                  part = "batch_hard"   # 17:00
-              elif 19 <= hour <= 21:
-                  part = "batch_scenario" # 20:00
-              elif 22 <= hour <= 23:
-                  part = "maintenance"    # 23:00
-          
-          if not part:
-              print("❌ Could not determine part from time.")
-              sys.exit(1)
-              
-          print(f"✅ Selected Part: {part}")
-          
-          # Write to GITHUB_ENV
-          with open(os.environ['GITHUB_ENV'], 'a') as f:
-              f.write(f"TARGET_PART={part}\n")
 
-      # 🚀 EXECUTE BOT
-      - name: Run Textbook Bot
-        if: env.TARGET_PART != ''
-        run: python run_textbook_bot.py --day auto --part ${{ env.TARGET_PART }}
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Determine Run Scope
+        id: scope
+        shell: bash
+        run: |
+          # Default to Inputs if manual, else defaults
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            DAY="${{ github.event.inputs.day }}"
+            PART="${{ github.event.inputs.part }}"
+            echo "👋 Manual Trigger Detected."
+          else
+            DAY="auto"
+            PART="all"
+            echo "🕒 Schedule Trigger Detected. Defaults: Day=Auto, Part=All"
+          fi
+
+          echo "✅ Selected Day: $DAY"
+          echo "✅ Selected Part: $PART"
+          
+          echo "day=$DAY" >> $GITHUB_OUTPUT
+          echo "part=$PART" >> $GITHUB_OUTPUT
+
+      - name: Run Textbook Generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          echo "🚀 Launching Bot... Day: ${{ steps.scope.outputs.day }}, Part: ${{ steps.scope.outputs.part }}"
+          python run_textbook_bot.py --day ${{ steps.scope.outputs.day }} --part ${{ steps.scope.outputs.part }}
+          # Force Workflow Refresh v1

@@ -45,17 +45,36 @@ class TextbookDB:
             return None
 
     def get_pydaily_quiz(self, day: int):
-        """Fetch quiz questions for a specific day."""
+        """Fetch quiz questions for a specific day from daily_content."""
         try:
-            # Table: quiz_questions
-            # Columns: day, questions (json)
-            response = self.client.table("quiz_questions") \
-                .select("*") \
+            # Table: daily_content
+            # Column: topic_content (stores JSON with quiz questions)
+            response = self.client.table("daily_content") \
+                .select("topic_content") \
                 .eq("day", day) \
                 .execute()
                 
             if response.data:
-                return response.data[0]
+                row = response.data[0]
+                raw_json = row.get('topic_content')
+                if raw_json:
+                    import json
+                    try:
+                        # Parse the JSON string
+                        data = json.loads(raw_json)
+                        # Check if it has questions
+                        if isinstance(data, dict) and 'questions' in data:
+                            return data
+                        
+                        # Fallback: check if it IS a list of questions
+                        if isinstance(data, list) and len(data) > 0 and 'question' in data[0]:
+                             return {'questions': data}
+
+                        logging.warning(f"Day {day}: topic_content JSON found but no 'questions' key.")
+                        return None
+                    except json.JSONDecodeError:
+                        logging.warning(f"Day {day}: topic_content is not valid JSON.")
+                        pass
             return None
         except Exception as e:
             logging.error(f"Error fetching quiz for day {day}: {e}")
