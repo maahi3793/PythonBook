@@ -142,24 +142,6 @@ class GeminiTextbook:
         prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic).replace("{{context}}", context)
         return self._call_gemini(prompt)
 
-    def generate_assessment_part1(self, day: int, topic: str) -> str:
-        """Generate Assessment Part 1: Warmup."""
-        template = self._load_prompt("assessment_part1.md")
-        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
-        return self._call_gemini(prompt)
-
-    def generate_assessment_part2(self, day: int, topic: str) -> str:
-        """Generate Assessment Part 2: Gauntlet."""
-        template = self._load_prompt("assessment_part2.md")
-        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
-        return self._call_gemini(prompt)
-
-    def generate_assessment_part3(self, day: int, topic: str) -> str:
-        """Generate Assessment Part 3: Interview."""
-        template = self._load_prompt("assessment_part3.md")
-        prompt = template.replace("{{day}}", str(day)).replace("{{topic}}", topic)
-        return self._call_gemini(prompt)
-
     def _call_gemini(self, prompt: str) -> str:
         """Call the API with retries using legacy SDK."""
         try:
@@ -177,5 +159,17 @@ class GeminiTextbook:
                 
             return text
         except Exception as e:
+            error_str = str(e).lower()
+            
+            # Detect quota/rate limit errors
+            if '429' in error_str or 'resource exhausted' in error_str or 'quota' in error_str:
+                logging.error(f"⚠️ QUOTA EXCEEDED: {e}")
+                raise QuotaExceededError(f"⚠️ QUOTA EXCEEDED. Please wait and retry. (Details: {e})")
+            
             logging.error(f"Gemini API Error: {e}")
             raise
+
+
+class QuotaExceededError(Exception):
+    """Custom exception for Gemini API quota/rate limit errors."""
+    pass

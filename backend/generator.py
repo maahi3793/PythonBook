@@ -3,7 +3,7 @@ import logging
 from backend.db_textbook import TextbookDB
 from backend.gemini_textbook import GeminiTextbook
 from backend.image_extractor import ImageExtractor
-from backend.curriculum import TOPICS
+from PyDailyEmail.backend.curriculum import TOPICS # Single Source of Truth
 
 class TextbookGenerator:
     """
@@ -39,26 +39,31 @@ class TextbookGenerator:
         # PART 1: THEORY
         # ==========================
         if part in ['all', 'part1']:
-            try:
-                logging.info(f"📘 Generating Day {day} Part 1...")
-                lesson = self.db.get_pydaily_lesson(day)
-                if not lesson:
-                    lesson_content = "Topic data not available."
-                    # FALLBACK: Use Curriculum Topic
-                    topic = TOPICS.get(day, f"Day {day}")
-                    logging.info(f"ℹ️ DB Lesson Missing. Fallback to Curriculum Topic: {topic}")
-                else:
-                    lesson_content = lesson.get('content', '')
-                    topic = lesson.get('topic', f"Day {day}")
-                
-                content = self.gemini.generate_part1_theory(day, topic, lesson_content)
-                self.db.update_chapter_part(day, 'content_part1_theory', content)
-                
-                images = self.extractor.extract_placeholders(content)
-                self.db.save_image_placeholders(day, images)
-                
-                self.db.log_generation(day, 'part1', 'completed')
-                results.append("Part 1 ✅")
+            # Skip if already generated
+            if self.db.has_part_content(day, 'part1'):
+                logging.info(f"⏭️ Skipping Part 1 for Day {day} (already generated)")
+                results.append("Part 1 ⏭️ (skipped)")
+            else:
+                try:
+                    logging.info(f"📘 Generating Day {day} Part 1...")
+                    lesson = self.db.get_pydaily_lesson(day)
+                    if not lesson:
+                        lesson_content = "Topic data not available."
+                        # FALLBACK: Use Curriculum Topic
+                        topic = TOPICS.get(day, f"Day {day}")
+                        logging.info(f"ℹ️ DB Lesson Missing. Fallback to Curriculum Topic: {topic}")
+                    else:
+                        lesson_content = lesson.get('content', '')
+                        topic = lesson.get('topic', f"Day {day}")
+                    
+                    content = self.gemini.generate_part1_theory(day, topic, lesson_content)
+                    self.db.update_chapter_part(day, 'content_part1_theory', content)
+                    
+                    images = self.extractor.extract_placeholders(content)
+                    self.db.save_image_placeholders(day, images)
+                    
+                    self.db.log_generation(day, 'part1', 'completed')
+                    results.append("Part 1 ✅")
             except Exception as e:
                 logging.error(f"Part 1 Failed: {e}")
                 self.db.log_generation(day, 'part1', 'failed', str(e))
@@ -68,48 +73,57 @@ class TextbookGenerator:
         # PART 2: PRACTICE
         # ==========================
         if part in ['all', 'part2']:
-            try:
-                logging.info(f"🧪 Generating Day {day} Part 2...")
-                # Re-fetch topic if needed (could optimize)
-                lesson = self.db.get_pydaily_lesson(day)
-                topic = lesson.get('topic', f"Day {day}") if lesson else f"Day {day}"
+            # Skip if already generated
+            if self.db.has_part_content(day, 'part2'):
+                logging.info(f"⏭️ Skipping Part 2 for Day {day} (already generated)")
+                results.append("Part 2 ⏭️ (skipped)")
+            else:
+                try:
+                    logging.info(f"🧪 Generating Day {day} Part 2...")
+                    lesson = self.db.get_pydaily_lesson(day)
+                    topic = lesson.get('topic', f"Day {day}") if lesson else f"Day {day}"
 
-                quiz = self.db.get_pydaily_quiz(day)
-                boss = self.db.get_pydaily_boss_battle(day)
-                
-                content = self.gemini.generate_part2_practice(day, topic, quiz, boss)
-                self.db.update_chapter_part(day, 'content_part2_practice', content)
-                
-                images = self.extractor.extract_placeholders(content)
-                self.db.save_image_placeholders(day, images)
-                
-                self.db.log_generation(day, 'part2', 'completed')
-                results.append("Part 2 ✅")
-            except Exception as e:
-                logging.error(f"Part 2 Failed: {e}")
-                self.db.log_generation(day, 'part2', 'failed', str(e))
-                results.append(f"Part 2 ❌ ({e})")
+                    quiz = self.db.get_pydaily_quiz(day)
+                    boss = self.db.get_pydaily_boss_battle(day)
+                    
+                    content = self.gemini.generate_part2_practice(day, topic, quiz, boss)
+                    self.db.update_chapter_part(day, 'content_part2_practice', content)
+                    
+                    images = self.extractor.extract_placeholders(content)
+                    self.db.save_image_placeholders(day, images)
+                    
+                    self.db.log_generation(day, 'part2', 'completed')
+                    results.append("Part 2 ✅")
+                except Exception as e:
+                    logging.error(f"Part 2 Failed: {e}")
+                    self.db.log_generation(day, 'part2', 'failed', str(e))
+                    results.append(f"Part 2 ❌ ({e})")
 
         # ==========================
         # PART 3: MENTOR
         # ==========================
         if part in ['all', 'part3']:
-            try:
-                logging.info(f"🎓 Generating Day {day} Part 3...")
-                lesson = self.db.get_pydaily_lesson(day)
-                topic = lesson.get('topic', f"Day {day}") if lesson else f"Day {day}"
+            # Skip if already generated
+            if self.db.has_part_content(day, 'part3'):
+                logging.info(f"⏭️ Skipping Part 3 for Day {day} (already generated)")
+                results.append("Part 3 ⏭️ (skipped)")
+            else:
+                try:
+                    logging.info(f"🎓 Generating Day {day} Part 3...")
+                    lesson = self.db.get_pydaily_lesson(day)
+                    topic = lesson.get('topic', f"Day {day}") if lesson else f"Day {day}"
 
-                nuggets = self.db.get_pydaily_nuggets(day)
-                
-                content = self.gemini.generate_part3_mentor(day, topic, nuggets)
-                self.db.update_chapter_part(day, 'content_part3_mentor', content)
-                
-                self.db.log_generation(day, 'part3', 'completed')
-                results.append("Part 3 ✅")
-            except Exception as e:
-                logging.error(f"Part 3 Failed: {e}")
-                self.db.log_generation(day, 'part3', 'failed', str(e))
-                results.append(f"Part 3 ❌ ({e})")
+                    nuggets = self.db.get_pydaily_nuggets(day)
+                    
+                    content = self.gemini.generate_part3_mentor(day, topic, nuggets)
+                    self.db.update_chapter_part(day, 'content_part3_mentor', content)
+                    
+                    self.db.log_generation(day, 'part3', 'completed')
+                    results.append("Part 3 ✅")
+                except Exception as e:
+                    logging.error(f"Part 3 Failed: {e}")
+                    self.db.log_generation(day, 'part3', 'failed', str(e))
+                    results.append(f"Part 3 ❌ ({e})")
 
         success = not any('❌' in r for r in results)
         return {'success': success, 'message': ", ".join(results)}
@@ -200,6 +214,12 @@ class TextbookGenerator:
             logging.info(f"🚀 Starting Q35 Generation for Day {day}: {topic} (All Batches)")
         
         for diff, count, xp in batches:
+            # Skip if exercises already exist for this day+difficulty
+            if self.db.has_exercises(day, diff):
+                logging.info(f"   ⏭️ Skipping {diff} batch (already exists)")
+                results.append(f"{diff} ⏭️ (skipped)")
+                continue
+                
             try:
                 logging.info(f"   Generating Batch: {count} {diff}...")
                 json_str = self.gemini.generate_exercise_batch(topic, diff, count, xp)

@@ -122,6 +122,56 @@ class TextbookDB:
             return []
 
     # ==========================================================
+    # 🔍 EXISTENCE CHECKS (Skip-If-Exists Logic)
+    # ==========================================================
+    
+    def has_part_content(self, day: int, part: str) -> bool:
+        """
+        Check if a specific part already has content in textbook_chapters.
+        part: 'part1', 'part2', 'part3'
+        """
+        column_map = {
+            'part1': 'content_part1_theory',
+            'part2': 'content_part2_practice',
+            'part3': 'content_part3_mentor'
+        }
+        column = column_map.get(part)
+        if not column:
+            return False
+            
+        try:
+            response = self.client.table("textbook_chapters") \
+                .select(column) \
+                .eq("day", day) \
+                .execute()
+                
+            if response.data and response.data[0].get(column):
+                # Content exists and is not empty
+                return True
+            return False
+        except Exception as e:
+            logging.error(f"Error checking part content for day {day} {part}: {e}")
+            return False
+    
+    def has_exercises(self, day: int, difficulty: str) -> bool:
+        """
+        Check if exercises for a specific day+difficulty already exist.
+        difficulty: 'Easy', 'Medium', 'Hard', 'Scenario'
+        """
+        try:
+            response = self.client.table("exercises") \
+                .select("id") \
+                .eq("day_number", day) \
+                .eq("difficulty", difficulty) \
+                .limit(1) \
+                .execute()
+                
+            return len(response.data) > 0
+        except Exception as e:
+            logging.error(f"Error checking exercises for day {day} {difficulty}: {e}")
+            return False
+
+    # ==========================================================
     # ✍️ WRITE TO TEXTBOOK
     # ==========================================================
 
