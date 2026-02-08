@@ -2,9 +2,18 @@ name: PythonBook Textbook Scheduler
 
 on:
   schedule:
-    # Schedule (UTC) -> IST (+5:30)
-    # 17:30 UTC -> 11:00 PM IST (Daily Full Generation)
-    - cron: '30 17 * * *'
+    # 1. 02:00 UTC - Theory (Part 1)
+    - cron: '0 2 * * *'
+    # 2. 05:00 UTC - Practice (Part 2)
+    - cron: '0 5 * * *'
+    # 3. 08:00 UTC - Mentor (Part 3)
+    - cron: '0 8 * * *'
+    # 4. 11:00 UTC - Q35 Easy
+    - cron: '0 11 * * *'
+    # 5. 14:00 UTC - Q35 Medium
+    - cron: '0 14 * * *'
+    # 6. 17:00 UTC - Q35 Hard
+    - cron: '0 17 * * *'
 
   workflow_dispatch:
     inputs:
@@ -13,7 +22,7 @@ on:
         required: true
         default: 'auto'
       part:
-        description: 'Part to generate (part1, part2, part3, summary, all)'
+        description: 'Part to generate'
         required: true
         default: 'all'
         type: choice
@@ -22,11 +31,19 @@ on:
         - part1
         - part2
         - part3
-        - summary
+        - batch_easy
+        - batch_medium
+        - batch_hard
 
 jobs:
   generate-textbook:
     runs-on: ubuntu-latest
+    
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -37,36 +54,59 @@ jobs:
           python-version: '3.10'
 
       - name: Install Dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Determine Run Scope
         id: scope
-        shell: bash
+        shell: python
         run: |
-          # Default to Inputs if manual, else defaults
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            DAY="${{ github.event.inputs.day }}"
-            PART="${{ github.event.inputs.part }}"
-            echo "👋 Manual Trigger Detected."
-          else
-            DAY="auto"
-            PART="all"
-            echo "🕒 Schedule Trigger Detected. Defaults: Day=Auto, Part=All"
-          fi
-
-          echo "✅ Selected Day: $DAY"
-          echo "✅ Selected Part: $PART"
+          import os
+          import datetime
+          import sys
           
-          echo "day=$DAY" >> $GITHUB_OUTPUT
-          echo "part=$PART" >> $GITHUB_OUTPUT
+          event_name = "${{ github.event_name }}"
+          manual_day = "${{ github.event.inputs.day }}"
+          manual_part = "${{ github.event.inputs.part }}"
+          
+          day = "auto"
+          part = ""
+          
+          if event_name == "workflow_dispatch":
+              print(f"👋 Manual Trigger Detected.")
+              day = manual_day
+              part = manual_part
+              
+          elif event_name == "schedule":
+              now = datetime.datetime.utcnow()
+              hour = now.hour
+              print(f"🕒 Schedule Trigger. UTC Hour: {hour}")
+              
+              # Map Hour to Part (Allowing 1hr variance)
+              if 1 <= hour <= 3:
+                  part = "part1"        # 02:00 - Theory
+              elif 4 <= hour <= 6:
+                  part = "part2"        # 05:00 - Practice
+              elif 7 <= hour <= 9:
+                  part = "part3"        # 08:00 - Mentor
+              elif 10 <= hour <= 12:
+                  part = "batch_easy"   # 11:00 - Q35 Easy
+              elif 13 <= hour <= 15:
+                  part = "batch_medium" # 14:00 - Q35 Medium
+              elif 16 <= hour <= 18:
+                  part = "batch_hard"   # 17:00 - Q35 Hard
+          
+          if not part:
+              print("❌ Could not determine part from time.")
+              sys.exit(1)
+              
+          print(f"✅ Selected Day: {day}")
+          print(f"✅ Selected Part: {part}")
+          
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"day={day}\n")
+              f.write(f"part={part}\n")
 
       - name: Run Textbook Generator
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
           echo "🚀 Launching Bot... Day: ${{ steps.scope.outputs.day }}, Part: ${{ steps.scope.outputs.part }}"
           python run_textbook_bot.py --day ${{ steps.scope.outputs.day }} --part ${{ steps.scope.outputs.part }}
-          # Force Workflow Refresh v1
