@@ -105,7 +105,7 @@ def main():
         # ROUTING LOGIC
         if args.part.startswith('batch_'):
             # It is a Q35 batch
-            from PyDailyEmail.backend.curriculum import TOPICS
+            from backend.curriculum import TOPICS
             topic = TOPICS.get(target_day, f"Day {target_day}")
             
             batch_map = {

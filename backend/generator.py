@@ -3,7 +3,7 @@ import logging
 from backend.db_textbook import TextbookDB
 from backend.gemini_textbook import GeminiTextbook
 from backend.image_extractor import ImageExtractor
-from PyDailyEmail.backend.curriculum import TOPICS # Single Source of Truth
+from backend.curriculum import TOPICS # Local copy - Single Source of Truth
 
 class TextbookGenerator:
     """
