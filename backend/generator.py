@@ -64,10 +64,10 @@ class TextbookGenerator:
                     
                     self.db.log_generation(day, 'part1', 'completed')
                     results.append("Part 1 ✅")
-            except Exception as e:
-                logging.error(f"Part 1 Failed: {e}")
-                self.db.log_generation(day, 'part1', 'failed', str(e))
-                results.append(f"Part 1 ❌ ({e})")
+                except Exception as e:
+                    logging.error(f"Part 1 Failed: {e}")
+                    self.db.log_generation(day, 'part1', 'failed', str(e))
+                    results.append(f"Part 1 ❌ ({e})")
 
         # ==========================
         # PART 2: PRACTICE
