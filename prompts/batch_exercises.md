@@ -3,7 +3,8 @@ Task: Generate {{count}} {{difficulty}} coding exercises for the topic '{{topic}
 
 Requirements:
 1. Output MUST be a strict JSON list of objects.
-2. Each object must have:
+2. CRITICAL: Generate EXACTLY {{count}} exercises. Do NOT generate more. Do NOT generate less.
+3. Each object must have:
    - "title": Short, catchy title.
    - "description": Detailed problem statement in Markdown.
    - "starter_code": The 'main.py' file given to students (with stubs).

@@ -15,6 +15,12 @@ Write a comprehensive theory section. This should feel like reading a university
 Start your response with EXACTLY this line:
 `# {{topic}}`
 
+**NEGATIVE CONSTRAINTS (DO NOT IGNORE):**
+- NO Practice Exercises.
+- NO Quizzes.
+- NO Homework assignments.
+- Theory ONLY.
+
 Do NOT add "Day X" or any other creative title. Use the exact topic provided.
 
 ## OUTPUT STRUCTURE

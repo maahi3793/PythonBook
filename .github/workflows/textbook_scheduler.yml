@@ -1,19 +1,19 @@
-name: PythonBook Textbook Scheduler
+name: Textbook Scheduler
 
 on:
   schedule:
-    # 1. 02:00 UTC - Theory (Part 1)
-    - cron: '0 2 * * *'
-    # 2. 05:00 UTC - Practice (Part 2)
-    - cron: '0 5 * * *'
-    # 3. 08:00 UTC - Mentor (Part 3)
-    - cron: '0 8 * * *'
-    # 4. 11:00 UTC - Q35 Easy
+    # 1. 03:30 UTC - Theory (Part 1)
+    - cron: '30 3 * * *'
+    # 2. 07:30 UTC - Practice (Part 2)
+    - cron: '30 7 * * *'
+    # 3. 11:00 UTC - Mentor (Part 3)
     - cron: '0 11 * * *'
-    # 5. 14:00 UTC - Q35 Medium
-    - cron: '0 14 * * *'
-    # 6. 17:00 UTC - Q35 Hard
-    - cron: '0 17 * * *'
+    # 4. 13:00 UTC - Batch Easy
+    - cron: '0 13 * * *'
+    # 5. 16:00 UTC - Batch Medium
+    - cron: '0 16 * * *'
+    # 6. 19:00 UTC - Batch Hard
+    - cron: '0 19 * * *'
 
   workflow_dispatch:
     inputs:
@@ -46,10 +46,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v3
         with:
           python-version: '3.10'
 
@@ -81,19 +81,19 @@ jobs:
               hour = now.hour
               print(f"🕒 Schedule Trigger. UTC Hour: {hour}")
               
-              # Map Hour to Part (Allowing 1hr variance)
-              if 1 <= hour <= 3:
-                  part = "part1"        # 02:00 - Theory
-              elif 4 <= hour <= 6:
-                  part = "part2"        # 05:00 - Practice
-              elif 7 <= hour <= 9:
-                  part = "part3"        # 08:00 - Mentor
-              elif 10 <= hour <= 12:
-                  part = "batch_easy"   # 11:00 - Q35 Easy
-              elif 13 <= hour <= 15:
-                  part = "batch_medium" # 14:00 - Q35 Medium
-              elif 16 <= hour <= 18:
-                  part = "batch_hard"   # 17:00 - Q35 Hard
+              # Map Hour to Part (Allowing variance)
+              if 3 <= hour <= 4:
+                  part = "part1"        # 03:30 - Theory
+              elif 7 <= hour <= 8:
+                  part = "part2"        # 07:30 - Practice
+              elif 11 <= hour <= 12:
+                  part = "part3"        # 11:00 - Mentor
+              elif 13 <= hour <= 14:
+                  part = "batch_easy"   # 13:00 - Q35 Easy
+              elif 16 <= hour <= 17:
+                  part = "batch_medium" # 16:00 - Q35 Medium
+              elif 19 <= hour <= 20:
+                  part = "batch_hard"   # 19:00 - Q35 Hard
           
           if not part:
               print("❌ Could not determine part from time.")
