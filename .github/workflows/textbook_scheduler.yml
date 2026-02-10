@@ -82,17 +82,17 @@ jobs:
               print(f"🕒 Schedule Trigger. UTC Hour: {hour}")
               
               # Map Hour to Part (Allowing variance)
-              if 3 <= hour <= 4:
-                  part = "part1"        # 03:30 - Theory
-              elif 7 <= hour <= 8:
+              if 3 <= hour <= 6:
+                  part = "part1"        # 03:30 - Theory (Allow 3h delay)
+              elif 7 <= hour <= 10:
                   part = "part2"        # 07:30 - Practice
               elif 11 <= hour <= 12:
-                  part = "part3"        # 11:00 - Mentor
-              elif 13 <= hour <= 14:
+                  part = "part3"        # 11:00 - Mentor (Gap is tighter here)
+              elif 13 <= hour <= 15:
                   part = "batch_easy"   # 13:00 - Q35 Easy
-              elif 16 <= hour <= 17:
+              elif 16 <= hour <= 18:
                   part = "batch_medium" # 16:00 - Q35 Medium
-              elif 19 <= hour <= 20:
+              elif 19 <= hour <= 23:
                   part = "batch_hard"   # 19:00 - Q35 Hard
           
           if not part:
